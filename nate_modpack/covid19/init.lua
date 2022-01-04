@@ -1,0 +1,153 @@
+-- covid19/init.lua
+
+
+local ExplosiveProjectile = {
+   initial_properties = {
+      physical = true,
+      collide_with_objects = false,
+      collisionbox = {-0.3, -0.3, -0.3, 0.3, 0.3, 0.3},
+      visual = "wielditem",
+      visual_size = {x = 0.4, y = 0.4},
+      textures = {""},
+      spritediv = {x = 1, y = 1},
+      initial_sprite_basepos = {x = 0, y = 0},
+   },
+   owner_name = nil,
+   pos = nil,
+   vel = nil
+}
+
+
+local function get_gravity()
+   return tonumber(minetest.settings:get("movement_gravity")) or 9.81
+end
+
+function ExplosiveProjectile:on_step(dtime, moveresult)
+
+   --self.object:add_velocity({x=0,y=-9.81*dtime,z=0})
+   local arr = moveresult.collisions
+   for i,x in pairs(arr) do
+      if x.type == "node" then
+	 local p = self.object:get_pos()
+	 -- This nil check is very important
+	 -- Always nil check the result of get_pos()
+	 if p == nil then
+	    return
+	 end
+	 self.object:remove()
+	 bombutil.boom(p, self.owner_name, {
+			  radius=5,
+			  explode_center=true,
+			  ignore_protection=false,
+			  ignore_on_blast_ents=true,
+			  ignore_on_blast_nodes=true,
+			  sound="tnt_explode",
+			  disable_drops=true
+	 })
+      end
+   end   
+   
+end
+
+function ExplosiveProjectile:get_staticdata()
+
+   return minetest.serialize({
+	 pos=self.pos,
+	 vel=self.vel,
+	 owner_name=self.owner_name
+   })
+end
+
+function ExplosiveProjectile:on_activate(staticdata, dtime_s)
+   self.object:set_armor_groups({immortal = 1})
+
+   local data
+   if staticdata ~= "" and staticdata ~= nil then
+      data = minetest.deserialize(staticdata) or {}
+   end
+   
+   self.owner_name = data.owner_name
+   self.vel = data.vel
+   self.pos = data.pos
+
+   if self.owner_name == nil or self.vel == nil or self.pos == nil then
+      -- entity is corrupt.
+      print(self.owner_name)
+      print(minetest.pos_to_string(self.pos))
+      print(minetest.pos_to_string(self.vel))
+      minetest.log("warning", "A covid19:ExplosiveProjectile instance is corrupt, removing.")
+      self.object:remove()
+      return
+   end
+   
+   self.object:set_velocity(self.vel)
+   self.object:set_acceleration({x=0,y=-get_gravity(),z=0})
+end
+
+
+-- Owner is a reference to the player who owns the projectile
+function LaunchExplosiveProjectile(pos, vel, owner_name)
+   local staticdata = minetest.serialize({
+	 pos=pos,
+	 vel=vel,
+	 owner_name=owner_name
+   })
+   minetest.add_entity(pos, "covid19:ExplosiveProjectile", staticdata)
+end
+
+
+minetest.register_entity("covid19:ExplosiveProjectile", ExplosiveProjectile)
+
+
+minetest.register_craftitem("covid19:vaccine_jj", {
+			       description = "Vaccine (J&J)",
+			       inventory_image = "covid19_vaccine_jj.png",
+			       sound = {breaks = "default_tool_breaks"},
+			       on_use = function(itemstack, user, pointed_thing)
+				  local sound_pos = user:get_pos()
+				  if sound_pos == nil then
+				     return
+				  end
+				  minetest.sound_play("smg-1", {pos = sound_pos, gain = 1.5, max_hear_distance = 8}, true)
+				  local player_name = user:get_player_name()			     
+				  local eye_offset = {x=0, y=1.625, z=0}
+				  local anim = user:get_local_animation()
+				  minetest.add_particle({
+					pos = sound_pos+eye_offset+user:get_look_dir(),
+					velocity = user:get_look_dir(),
+					acceleration = vector.new(),
+					expirationtime = 0.4,
+					size = 5,
+					collisiondetection = false,
+					vertical = true,
+					texture = "tnt_smoke.png",
+					glow = 15,
+				  })
+
+				  local pos = user:get_pos()
+				  if pos == nil then
+				     return
+				  end
+				  pos = pos + {x=0,y=1.625,z=0}
+				  local vel = user:get_velocity() + (user:get_look_dir()*20)
+
+				  LaunchExplosiveProjectile(pos, vel, user:get_player_name())
+				  
+				  if minetest.is_creative_enabled(player_name) then
+				     return itemstack
+				  end
+				  
+				  itemstack:take_item()
+				  return itemstack
+			       end
+})
+
+
+minetest.register_craft({
+      output = "covid19:vaccine_jj",
+      recipe = {
+	 {"", "", ""},
+	 {"", "default:paper", "default:paper"},
+	 {"", "", ""},
+      }
+})

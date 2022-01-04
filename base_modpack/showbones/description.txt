@@ -1,0 +1,2 @@
+A mod that saves bones positions in a "database".
+Using chatcommand /showbones will reveal visual waypoints of bones locations with distance to simplify recovery.
