@@ -1,0 +1,36 @@
+#    If this is enabled, players will have the option to hear a bell play
+#    whenever their name is mentioned in chat in addition to the message being
+#    highlighted in green.
+chat3.bell (Chatbell) bool true
+
+#    If this is not set to 0, players within this range of each other will see
+#    messages highlighted in blue to indicate that they are close.
+chat3.near (Near Highlight Range) float 12
+
+#    If this is true, players can cause messages to be highlighted in red for
+#    all players and the chatbell to be played (if enabled) by prefixing their
+#    message, by default, with "!" (configurable with chat3.shout_prefix).
+chat3.shout (Enable Shout Messages) bool true
+
+#    The single-character prefix to cause messages to be highlighted in red for
+#    all players and the chatbell to be played (if enabled). This setting only
+#    applies if chat3.shout is set to true.
+chat3.shout_prefix (Shout Prefix) string !
+
+#    When enabled, a /ignore chatcommand is added which allows players to ignore
+#    chat messages and PMs from players which they have added (see /help ignore).
+#    Non-ignorable players can be added with by granting the `ignore_override`.
+#    This will prevent these players from being added to ignore lists and will
+#    automatically remove them should they already exist. The server owner (as
+#    defined by the `name` setting) cannot be ignored no matter what.
+chat3.ignore (Enable Ignore Feature) bool true
+
+#    When enabled, players can add a limitted number of alternate usernames
+#    which chat3 will check incoming messages for in order to expand
+#    highlighting. The max number of allowed alternate usernames can be
+#    configured with chat3.alt_max (defaults to 3).
+chat3.alt_support (Allow players to add alts) bool true
+
+#    If chat3.alt_support is enabled, this will control the maximum number of
+#    alternate usernames that each player is allowed to configure.
+chat3.alt_max (Configure maximum alts) int 3 1 1000
