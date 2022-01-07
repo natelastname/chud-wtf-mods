@@ -127,7 +127,7 @@ minetest.register_craftitem("covid19:vaccine_jj", {
 				  print(dump(user:get_look_dir()))
 				  print(dump(sound_pos))
 				  minetest.add_particle({
-					pos = sound_pos+eye_offset+user:get_look_dir(),
+					pos = vector.add(sound_pos,eye_offset+user:get_look_dir()),
 					velocity = user:get_look_dir(),
 					acceleration = vector.new(),
 					expirationtime = 0.4,
