@@ -176,6 +176,10 @@ function factions.leave_faction(fname, player_name)
    return true
 end
 
+
+
+
+
 -- Chat commands
 local function handle_command(name, param)
    local params = {}
@@ -452,8 +456,6 @@ local function handle_command(name, param)
 	    minetest.chat_send_player(name, S("Failed to transfer ownership."))
 	 end
       end
-   elseif action == "invite" then
-      minetest.chat_send_player(name, "Invite is not yet implemented. Use /f join <faction> <password>")
    elseif action == "forcejoin" then
       if not minetest.get_player_privs(name).playerfactions_admin then
 	 minetest.chat_send_player(name, S("Permission denied: You can't use this command, playerfactions_admin priv is needed."))
@@ -474,6 +476,24 @@ local function handle_command(name, param)
 	    end
 	 end
       end
+   elseif action == "invite" then
+      minetest.chat_send_player(name, "Invite is not yet implemented. Use /f join <faction> <password>")
+   elseif action == "showclaim" then
+      simple_protection.show(name)
+   elseif action == "claimlist" then
+      simple_protection.list(name)
+   elseif action == "radar" then
+      simple_protection.radar(name)
+   elseif action == "claim" then
+      simple_protection.claim(name)
+   elseif action == "unclaim" then
+      simple_protection.unclaim(name)
+   elseif action == "unclaimall" then
+      simple_protection.delete_self(name)
+   elseif action == "sethome" then
+      minetest.chat_send_player(name, "sethome is not yet implemented.")
+   elseif action == "home" then
+      minetest.chat_send_player(name, "home is not yet implemented.")
    else
       minetest.chat_send_player(name, S("Unknown subcommand. Run '/help f' for help."))
    end
@@ -492,7 +512,16 @@ minetest.register_chatcommand("f", {
 				    .."passwd <password> [faction]: "..S("Change your faction's password or the password of the given faction").."\n"
 				    .."chown <player> [faction]: "..S("Transfer ownership of your faction").."\n"
 				    .."invite <player>: "..S("Invite a player to your faction.").."\n"
-				    .."forcejoin <player> <faction>: "..S("Add player to a faction. Requires playerfactions_admin priv.").."\n",
+				    .."forcejoin <player> <faction>: "..S("Add player to a faction. Requires playerfactions_admin priv.").."\n"
+				    .."invite <player>: ".."Invite a player to your faction.".."\n"
+				    .."showclaim: ".."Make the boundaries of the currently occupied claim visible.".."\n"
+				    .."claimlist: ".."List the location of the faction's claims.".."\n"
+				    .."radar: ".."Show a map of nearby claims.".."\n"
+				    .."claim: ".."Attempt to claim the land that you are standing on.".."\n"
+				    .."unclaim: ".."Attempt to unclaim the land that you are standing on.".."\n"
+				    .."unclaimall: ".."Unclaim all faction territory.".."\n"
+				    .."sethome: ".."Set the faction home position.".."\n"
+				    .."home: ".."Teleport to the faction home position.".."\n",
 				 description = "",
 				 privs = {},
 				 func = handle_command
