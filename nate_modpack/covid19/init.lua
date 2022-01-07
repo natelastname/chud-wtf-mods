@@ -124,6 +124,8 @@ minetest.register_craftitem("covid19:vaccine_jj", {
 				  local player_name = user:get_player_name()			     
 				  local eye_offset = {x=0, y=1.625, z=0}
 				  local anim = user:get_local_animation()
+				  print(dump(user:get_look_dir()))
+				  print(dump(sound_pos))
 				  minetest.add_particle({
 					pos = sound_pos+eye_offset+user:get_look_dir(),
 					velocity = user:get_look_dir(),
