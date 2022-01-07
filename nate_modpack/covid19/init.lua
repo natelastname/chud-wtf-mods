@@ -126,13 +126,14 @@ minetest.register_craftitem("covid19:vaccine_jj", {
 				  local anim = user:get_local_animation()
 
 				  -- There is a really stupid bug here, don't try to refactor these next 4 lines
+				  local lookdir = user:get_look_dir()
 				  local p = vector.new(eye_offset.x + sound_pos.x + lookdir.x,
 						       eye_offset.y + sound_pos.y + lookdir.y,
 						       eye_offset.z + sound_pos.z + lookdir.z)
 				  
 				  minetest.add_particle({
 					pos = p,
-					velocity = user:get_look_dir(),
+					velocity = lookdir,
 					acceleration = vector.new(),
 					expirationtime = 0.4,
 					size = 5,
