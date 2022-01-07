@@ -1,6 +1,18 @@
 -- covid19/init.lua
 
 
+covid19 = {}
+covid19.path = minetest.get_modpath("covid19")
+
+dofile(covid19.path.."/mask.lua")
+dofile(covid19.path.."/pathogen.lua")
+
+-- This will hopefully not break worlds with existing pathogen items
+minetest.register_alias("mask:mask", "covid19:mask")
+minetest.register_alias("pathogen:decontaminator", "covid19:decontaminator")
+minetest.register_alias("pathogen:fence_warning", "covid19:fence_warning")
+
+
 local ExplosiveProjectile = {
    initial_properties = {
       physical = true,

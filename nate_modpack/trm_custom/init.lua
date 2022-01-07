@@ -14,6 +14,6 @@
    returns: true on success, false on failure
 ]]
 treasurer.register_treasure("covid19:vaccine_jj", 0.25, 0, 1,nil,"default_dungeon_loot")
-treasurer.register_treasure("mask:mask", 0.25, 0, 1,nil,"default_dungeon_loot")
+treasurer.register_treasure("covid19:mask", 0.25, 0, 1,nil,"default_dungeon_loot")
 treasurer.register_treasure("default:gold_ingot",0.5,0, {1,10},nil,"default_dungeon_loot")
 treasurer.register_treasure("default:wood",0.5, 0, {1,20},nil,"default_dungeon_loot")

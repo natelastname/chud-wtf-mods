@@ -2,9 +2,9 @@
 -- https://github.com/bas080/pathogen/tree/master/pathogen
 --
 
-xpanes.register_pane("pathogen:fence_warning", {
+xpanes.register_pane("covid19:fence_warning", {
 			description = "Infection Hazard Fence",
-			tiles = {"pathogen_fence.png"},
+			tiles = {"covid19_fence.png"},
 			drawtype = "airlike",
 			paramtype = "light",
 			sunlight_propagates = true,
@@ -13,9 +13,9 @@ xpanes.register_pane("pathogen:fence_warning", {
 			diggable = false,
 			buildable_to = true,
 			air_equivalent = true,
-			textures = {"pathogen_fence.png", "pathogen_fence.png", 'xpanes_space.png'},
-			inventory_image = "pathogen_fence.png",
-			wield_image = "pathogen_fence.png",
+			textures = {"covid19_fence.png", "covid19_fence.png", 'xpanes_space.png'},
+			inventory_image = "covid19_fence.png",
+			wield_image = "covid19_fence.png",
 			groups = {snappy=2, cracky=3, oddly_breakable_by_hand=3, pane=1},
 			recipe = {
 			   {'group:stick', '', 'group:stick'},
@@ -26,7 +26,7 @@ xpanes.register_pane("pathogen:fence_warning", {
 })
 
 minetest.register_craft({
-      output = "pathogen:fence_warning",
+      output = "covid19:fence_warning",
       recipe = {
 	 {'group:stick', '', 'group:stick'},
 	 {'group:stick', 'dye:red', 'group:stick'},
@@ -35,17 +35,17 @@ minetest.register_craft({
 })
 
 
-minetest.register_tool( 'pathogen:decontaminator', {
+minetest.register_tool( 'covid19:decontaminator', {
 			   description = 'Decontaminator',
 
-			   inventory_image = "pathogen_decontaminator.png",
+			   inventory_image = "covid19_decontaminator.png",
 			   on_use = function(itemstack, user, pt)
 
 			      local p = user:get_pos()
 			      if p == nil then
 				 return itemstack
 			      end
-			      minetest.sound_play( "pathogen_spray", {pos = p, gain = 1.0, max_hear_distance = 8}, true)
+			      minetest.sound_play( "covid19_spray", {pos = p, gain = 1.0, max_hear_distance = 8}, true)
 			      if pt.type ~= "node" then
 				 return itemstack
 			      end
@@ -59,7 +59,7 @@ minetest.register_tool( 'pathogen:decontaminator', {
 })
 
 minetest.register_craft({
-      output = "pathogen:decontaminator",
+      output = "covid19:decontaminator",
       recipe = {
 	 {'default:steel_ingot','',''},
 	 {'','default:steelblock',''},
