@@ -122,12 +122,15 @@ minetest.register_craftitem("covid19:vaccine_jj", {
 				  end
 				  minetest.sound_play("smg-1", {pos = sound_pos, gain = 1.5, max_hear_distance = 8}, true)
 				  local player_name = user:get_player_name()			     
-				  local eye_offset = vector.new(0, 1.625, 0)
+				  local eye_offset = {x=0, y=1.625, z=0}
 				  local anim = user:get_local_animation()
-				  local look_dir = user:get_look_dir()
+				  
+				  local p = vector.new(eye_offset.x, eye_offset.y, eye_offset.z)
+				  p = p + sound_pos + user:get_look_dir()
+				  
 				  minetest.add_particle({
-					pos = vector.add(sound_pos,eye_offset+look_dir),
-					velocity = look_dir,
+					pos = p,
+					velocity = user:get_look_dir(),
 					acceleration = vector.new(),
 					expirationtime = 0.4,
 					size = 5,
