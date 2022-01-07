@@ -148,7 +148,7 @@ minetest.register_craftitem("covid19:vaccine_jj", {
 				     return
 				  end
 				  pos = vector.add(vector.new(pos), vector.new({x=0,y=1.625,z=0}))
-				  local vel = vector.add(vector.new(user:get_velocity()), vector.new(user:get_look_dir())*20)
+				  local vel = vector.add(vector.new(user:get_velocity()), vector.new(user:get_look_dir()*20))
 
 				  LaunchExplosiveProjectile(pos, vel, user:get_player_name())
 				  
