@@ -281,8 +281,9 @@ function online_shop.open_shop_formspec(player_name, pos)
    local player = minetest.get_player_by_name(player_name)
    local meta = minetest.get_meta(pos)
 
-   -- if player_name == meta:get_string("owner") and not player:get_player_control().aux1 then
-   if true then
+   print("Remote open?")
+   
+   if player_name == meta:get_string("owner") and not player:get_player_control().aux1 then
       minetest.show_formspec(player_name, "online_shop:shop_server_formspec", online_shop.shop_server(pos))
       local msv = meta:get_string("store_name")
       mod_storage.set_value("original_store_name", msv)

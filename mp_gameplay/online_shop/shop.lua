@@ -78,8 +78,10 @@ minetest.register_node("online_shop:shop_server", {
 		mod_storage.set_value("last_pos", minetest.pos_to_string(pos))
 		mod_storage.set_value("last_store_owner", clicker:get_player_name())
 		local meta = minetest.get_meta(pos)
-		--if clicker:get_player_name() == meta:get_string("owner") and not clicker:get_player_control().aux1 then
-		if true then
+		print("Local open?")
+		if clicker:get_player_name() == meta:get_string("owner") and not clicker:get_player_control().aux1 then
+		-- Always open the admin interface
+		--if true then
 			minetest.show_formspec(clicker:get_player_name(), "online_shop:shop_server_formspec", online_shop.shop_server(pos))
 			local msv = meta:get_string("store_name")
 			mod_storage.set_value("original_store_name", msv)
