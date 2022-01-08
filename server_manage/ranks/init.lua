@@ -239,7 +239,9 @@ function ranks.chat_send(name, message)
    end
    if playerfactions_exists then
       local facts = factions.get_player_factions(name)
-
+      print(#facts)
+      print(dump(facts))
+      
       if facts ~= nil then
 	 if #facts > 1 then
 	    minetest.log("warning", "Player ".. name.." is a member of multiple factions")
