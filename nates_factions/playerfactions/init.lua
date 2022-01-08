@@ -488,7 +488,8 @@ local function handle_command(name, param)
       if not minetest.get_player_privs(name).playerfactions_admin then
 	 minetest.chat_send_player(name, S("Permission denied: You can't use this command, playerfactions_admin priv is needed."))
       else
-      print(dump(facts))
+	 print(dump(facts))
+      end
    elseif action == "invite" then
       minetest.chat_send_player(name, "Invite is not yet implemented. Use /f join <faction> <password>")
    elseif action == "showclaim" then
