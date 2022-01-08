@@ -485,7 +485,7 @@ local function handle_command(name, param)
 	 end
       end
    elseif action == "debug" then
-      minetest.chat_send_player(name, "Invite is not yet implemented. Use /f join <faction> <password>")
+      print(dump(facts))
    elseif action == "invite" then
       minetest.chat_send_player(name, "Invite is not yet implemented. Use /f join <faction> <password>")
    elseif action == "showclaim" then
