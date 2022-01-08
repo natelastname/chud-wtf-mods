@@ -485,6 +485,9 @@ local function handle_command(name, param)
 	 end
       end
    elseif action == "debug" then
+      if not minetest.get_player_privs(name).playerfactions_admin then
+	 minetest.chat_send_player(name, S("Permission denied: You can't use this command, playerfactions_admin priv is needed."))
+      else
       print(dump(facts))
    elseif action == "invite" then
       minetest.chat_send_player(name, "Invite is not yet implemented. Use /f join <faction> <password>")
@@ -523,6 +526,7 @@ minetest.register_chatcommand("f", {
 				    .."chown <player> [faction]: "..S("Transfer ownership of your faction").."\n"
 				    .."invite <player>: "..S("Invite a player to your faction.").."\n"
 				    .."forcejoin <player> <faction>: "..S("Add player to a faction. Requires playerfactions_admin priv.").."\n"
+				    .."debug: ".. "Print factions table to logs. Requires playerfactions_admin priv." .."\n"
 				    .."invite <player>: ".."Invite a player to your faction.".."\n"
 				    .."showclaim: ".."Make the boundaries of the currently occupied claim visible.".."\n"
 				    .."claimlist: ".."List the location of the faction's claims.".."\n"
