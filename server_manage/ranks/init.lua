@@ -227,9 +227,6 @@ end
 -- [function] Send prefixed message (if enabled)
 function ranks.chat_send(name, message)
    local prefix = ""
-   print("Chat")
-   print(playerfactions_exists)
-
    if minetest.settings:get("ranks.prefix_chat") ~= "false" then
       local rank = ranks.get_rank(name)
       if rank ~= nil then
@@ -241,7 +238,11 @@ function ranks.chat_send(name, message)
       end
    end
    if playerfactions_exists then
-      local fact_name = factions.get_player_faction(name)
+      local facts = factions.get_player_factions(name)
+      if #facts > 1 then
+	 minetest.log("warning", "Player ".. name.." is a member of multiple factions")
+      end
+      local fact_name = facts[0]
       if fact_name ~= nil then
 	 prefix = prefix .. "[".. fact_name .."]"
       end
