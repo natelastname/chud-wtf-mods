@@ -239,12 +239,15 @@ function ranks.chat_send(name, message)
    end
    if playerfactions_exists then
       local facts = factions.get_player_factions(name)
-      if #facts > 1 then
-	 minetest.log("warning", "Player ".. name.." is a member of multiple factions")
-      end
-      local fact_name = facts[0]
-      if fact_name ~= nil then
-	 prefix = prefix .. "[".. fact_name .."]"
+
+      if facts ~= nil then
+	 if #facts > 1 then
+	    minetest.log("warning", "Player ".. name.." is a member of multiple factions")
+	 end	 
+	 local fact_name = facts[0]
+	 if fact_name ~= nil then
+	    prefix = prefix .. "[".. fact_name .."]"
+	 end
       end
    end
    
