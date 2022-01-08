@@ -276,21 +276,23 @@ function online_shop.get_give(player, meta, pos)
 end
 
 function online_shop.open_shop_formspec(player_name, pos)
-	mod_storage.set_value("last_pos", minetest.pos_to_string(pos))
-	mod_storage.set_value("last_store_owner", player_name)
-	local player = minetest.get_player_by_name(player_name)
-	local meta = minetest.get_meta(pos)
-	if player_name == meta:get_string("owner") and not player:get_player_control().aux1 then
-		minetest.show_formspec(player_name, "online_shop:shop_server_formspec", online_shop.shop_server(pos))
-		local msv = meta:get_string("store_name")
-		mod_storage.set_value("original_store_name", msv)
-	elseif minetest.check_player_privs(player_name, { online_shop_admin = true }) then
-		minetest.show_formspec(player_name, "online_shop:shop_server_formspec", online_shop.shop_server(pos))
-		local msv = meta:get_string("store_name")
-		mod_storage.set_value("original_store_name", msv)
-	else
-		minetest.chat_send_player(player_name, "You do not own this shop server.")
-	end
+   mod_storage.set_value("last_pos", minetest.pos_to_string(pos))
+   mod_storage.set_value("last_store_owner", player_name)
+   local player = minetest.get_player_by_name(player_name)
+   local meta = minetest.get_meta(pos)
+
+   -- if player_name == meta:get_string("owner") and not player:get_player_control().aux1 then
+   if true then
+      minetest.show_formspec(player_name, "online_shop:shop_server_formspec", online_shop.shop_server(pos))
+      local msv = meta:get_string("store_name")
+      mod_storage.set_value("original_store_name", msv)
+   elseif minetest.check_player_privs(player_name, { online_shop_admin = true }) then
+      minetest.show_formspec(player_name, "online_shop:shop_server_formspec", online_shop.shop_server(pos))
+      local msv = meta:get_string("store_name")
+      mod_storage.set_value("original_store_name", msv)
+   else
+      minetest.chat_send_player(player_name, "You do not own this shop server.")
+   end
 end
 
 function online_shop.create_inventory(player_name)
