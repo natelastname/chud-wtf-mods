@@ -125,7 +125,7 @@ function chat3.send(name, msg, prefix, source)
 				and (not ignore or not chat3.ignore.is(rname, name)) then
 			-- Check for near
 			if near ~= 0 then -- and name ~= rname then
-				if vector.distance(sender:getpos(), player:getpos()) <= near then
+				if vector.distance(sender:get_pos(), player:get_pos()) <= near then
 					colour = "#88ffff"
 				end
 			end
