@@ -276,12 +276,12 @@ function online_shop.get_give(player, meta, pos)
 end
 
 function online_shop.open_shop_formspec(player_name, pos)
+   -- This is executed when the owner of a shop server hits the "manage" button
+   -- through the /online_shopping formspec.
    mod_storage.set_value("last_pos", minetest.pos_to_string(pos))
    mod_storage.set_value("last_store_owner", player_name)
    local player = minetest.get_player_by_name(player_name)
    local meta = minetest.get_meta(pos)
-
-   print("Remote open?")
    
    if player_name == meta:get_string("owner") and not player:get_player_control().aux1 then
       minetest.show_formspec(player_name, "online_shop:shop_server_formspec", online_shop.shop_server(pos))
