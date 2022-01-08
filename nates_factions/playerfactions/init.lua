@@ -62,8 +62,9 @@ function factions.get_player_factions(name)
 	 table.insert(player_factions, fname)
       end
    end
-   if player_factions == nil:
+   if player_factions == nil then
       return nil
+   end
    
    if #player_factions > 1 and player_factions.mode_unique_faction == true then
       minetest.log("warning", "Player ".. name.." is a member of multiple factions with player_factions.mode_unique_faction=true")
