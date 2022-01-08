@@ -45,16 +45,31 @@ minetest.register_tool( 'covid19:decontaminator', {
 			      if p == nil then
 				 return itemstack
 			      end
-			      minetest.sound_play( "covid19_spray", {pos = p, gain = 1.0, max_hear_distance = 8}, true)
-			      if pt.type ~= "node" then
-				 return itemstack
-			      end
-			      print(pt.type)
 			      local rando = math.random(5)
 			      if rando == 1 then
+				 minetest.sound_play( "covid19_alarm", {pos = p, gain = 1.0, max_hear_distance = 150}, true)
+				 bombutil.boom(p, user:get_player_name(), {
+						  radius=4,
+						  explode_center=true,
+						  ignore_protection=false,
+						  ignore_on_blast_ents=true,
+						  ignore_on_blast_nodes=true,
+						  sound="tnt_explode",
+						  disable_drops=true
+				 })
+				 user:punch(user, nil, {
+					       full_punch_interval=1.5,
+					       max_drop_level=1,
+					       groupcaps={
+						  crumbly={maxlevel=2, uses=20, times={[1]=1.60, [2]=1.20, [3]=0.80}}
+					       },
+					       damage_groups = {fleshy=20}
+						       }, vector.new(0,-1,0))
+				 itemstack:add_wear(70000)
 				 return itemstack
 			      end
-			      --pathogen.decontaminate( pt.under )
+			      minetest.sound_play( "covid19_spray", {pos = p, gain = 1.0, max_hear_distance = 8}, true)
+			      return itemstack
 			   end
 })
 

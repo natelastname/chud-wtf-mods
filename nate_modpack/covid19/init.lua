@@ -48,7 +48,7 @@ function ExplosiveProjectile:on_step(dtime, moveresult)
 	 end
 	 self.object:remove()
 	 bombutil.boom(p, self.owner_name, {
-			  radius=5,
+			  radius=2,
 			  explode_center=true,
 			  ignore_protection=false,
 			  ignore_on_blast_ents=true,
@@ -125,7 +125,8 @@ minetest.register_craftitem("covid19:vaccine_jj", {
 				  local eye_offset = {x=0, y=1.625, z=0}
 				  local anim = user:get_local_animation()
 
-				  -- There is a really stupid bug here, don't try to refactor these next 4 lines
+				  -- There is a really stupid bug here (it won't recognize vector addition, but only on the server.)
+				  -- don't try to refactor these next 4 lines or the rest of this function
 				  local lookdir = user:get_look_dir()
 				  local p = vector.new(eye_offset.x + sound_pos.x + lookdir.x,
 						       eye_offset.y + sound_pos.y + lookdir.y,
