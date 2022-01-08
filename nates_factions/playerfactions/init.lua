@@ -23,8 +23,6 @@ end
 factions.mode_unique_faction = minetest.settings:get_bool("player_factions.mode_unique_faction", true)
 factions.max_members_list = tonumber(minetest.settings:get("player_factions.max_members_list")) or 50
 
-
-
 local function save_factions()
    storage:set_string("facts", minetest.serialize(facts))
 end
@@ -54,16 +52,6 @@ function factions.player_is_in_faction(fname, player_name)
    return facts[fname].members[player_name]
 end
 
-function factions.get_player_faction(name)
-   minetest.log("warning", "Function factions.get_player_faction() is deprecated in favor of factions.get_player_factions(). Please check updates of mods depending on playerfactions.")
-   for fname, fact in pairs(facts) do
-      if fact.members[name] then
-	 return fname
-      end
-   end
-   return nil
-end
-
 function factions.get_player_factions(name)
    local player_factions = nil
    for fname, fact in pairs(facts) do
@@ -74,7 +62,27 @@ function factions.get_player_factions(name)
 	 table.insert(player_factions, fname)
       end
    end
+   if #player_factions > 1 and player_factions.mode_unique_faction == true then
+      minetest.log("warning", "Player ".. name.." is a member of multiple factions with player_factions.mode_unique_faction=true")
+   end	 
+
    return player_factions
+end
+
+
+function factions.get_player_faction(name)
+   if factions.mode_unique_faction == false then
+      minetest.log("warning", "Call to factions.get_player_faction with setting player_factions.mode_unique_faction=false.")
+   end
+   local facts = factions.get_player_factions(name)
+   if facts == nil then
+      return nil
+   end
+   if #facts ~= 1 then
+      minetest.log("warning", "Player ".. name .. " is not a member of one single faction.")
+      return facts[1]
+   end
+   return facts[1]
 end
 
 function factions.get_owned_factions(name)
@@ -476,6 +484,8 @@ local function handle_command(name, param)
 	    end
 	 end
       end
+   elseif action == "debug" then
+      minetest.chat_send_player(name, "Invite is not yet implemented. Use /f join <faction> <password>")
    elseif action == "invite" then
       minetest.chat_send_player(name, "Invite is not yet implemented. Use /f join <faction> <password>")
    elseif action == "showclaim" then
