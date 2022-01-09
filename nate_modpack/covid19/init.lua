@@ -47,7 +47,21 @@ function ExplosiveProjectile:on_step(dtime, moveresult)
 	    return
 	 end
 	 self.object:remove()
+	 -- Don't pass the name of the owner because we want
+	 -- players to be able to grief eachother using this.
+	 
+	 --[[
 	 bombutil.boom(p, self.owner_name, {
+			  radius=2,
+			  explode_center=true,
+			  ignore_protection=false,
+			  ignore_on_blast_ents=true,
+			  ignore_on_blast_nodes=true,
+			  sound="tnt_explode",
+			  disable_drops=true
+	 })
+	 ]]--
+	 bombutil.boom(p, "", {
 			  radius=2,
 			  explode_center=true,
 			  ignore_protection=false,

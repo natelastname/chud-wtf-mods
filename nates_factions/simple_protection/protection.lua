@@ -23,10 +23,10 @@ end
 
 sp.old_is_protected = minetest.is_protected
 minetest.is_protected = function(pos, player_name)
-	if sp.can_access(pos, player_name) then
-		return sp.old_is_protected(pos, player_name)
-	end
-	return true
+   if sp.can_access(pos, player_name) then
+      return sp.old_is_protected(pos, player_name)
+   end
+   return true
 end
 
 minetest.register_on_protection_violation(notify_player)

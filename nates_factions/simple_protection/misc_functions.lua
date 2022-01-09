@@ -13,77 +13,49 @@ local registered_on_access = {}
 local sp = simple_protection
 
 sp.can_access = function(pos, player_name)
-	if not player_name then
-		return false
-	end
-	-- Allow access for pipeworks and unidentified mods
-	if player_name == ":pipeworks"
-			or player_name == "" then
-		return true
-	end
+   if not player_name then
+      return false
+   end
+   -- Allow access for pipeworks and unidentified mods
+   if player_name == ":pipeworks" or player_name == "" then
+      return true
+   end
 
-	-- Admin power, handle privileges
-	local privs = get_player_privs(player_name)
-	if privs.simple_protection or privs.protection_bypass then
-		return true
-	end
+   -- Admin power, handle privileges
+   local privs = get_player_privs(player_name)
+   if privs.simple_protection or privs.protection_bypass then
+      return true
+   end
 
-	-- Data of current area
-	local data = sp.get_claim(pos)
+   -- Data of current area
+   local data = sp.get_claim(pos)
 
-	-- Area is not claimed
-	if not data then
-		-- Allow digging when claiming is not forced
-		if not sp.claim_to_dig then
-			return true
-		end
+   -- Area is not claimed
+   if not data then
+      -- Allow digging when claiming is not forced
+      if not sp.claim_to_dig then
+	 return true
+      end
 
-		-- Must claim everywhere? Disallow everywhere.
-		if not sp.underground_limit then
-			return false
-		end
-		-- Is it in claimable area? Yes? Disallow.
-		if pos.y >= sp.underground_limit then
-			return false
-		end
-		return true
-	end
-	if player_name == data.owner then
-		return true
-	end
+      -- Must claim everywhere? Disallow everywhere.
+      if not sp.underground_limit then
+	 return false
+      end
+      -- Is it in claimable area? Yes? Disallow.
+      if pos.y >= sp.underground_limit then
+	 return false
+      end
+      return true
+   end
 
-	-- Complicated-looking return value handling:
-	-- false: Forbid access instantly
-	-- true:  Access granted if none returns false
-	-- nil:   Do nothing
-	local override_access = false
-	for i = 1, #registered_on_access do
-		local ret = registered_on_access[i](
-			vector.new(pos), player_name, data.owner)
+   -- A simple modification to give factions access to eachother's territory.
+   -- Doesn't support the case where factions.mode_unique_faction=false.
+   if factions.get_player_faction(player_name) == factions.get_player_faction(data.owner) then
+      return true
+   end
 
-		if ret == false then
-			return false
-		end
-		if ret == true then
-			override_access = true
-		end
-	end
-	if override_access then
-		return true
-	end
-
-	-- Owner shared the area with the player
-	if sp.is_shared(data.owner, player_name) then
-		return true
-	end
-	-- Globally shared area
-	if sp.is_shared(data, player_name) then
-		return true
-	end
-	if sp.is_shared(data, "*all") then
-		return true
-	end
-	return false
+   
+   
 end
 
 sp.register_on_access = function(func)

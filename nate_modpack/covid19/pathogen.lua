@@ -48,6 +48,7 @@ minetest.register_tool( 'covid19:decontaminator', {
 			      local rando = math.random(5)
 			      if rando == 1 then
 				 minetest.sound_play( "covid19_alarm", {pos = p, gain = 1.0, max_hear_distance = 150}, true)
+				 --[[
 				 bombutil.boom(p, user:get_player_name(), {
 						  radius=4,
 						  explode_center=true,
@@ -57,6 +58,17 @@ minetest.register_tool( 'covid19:decontaminator', {
 						  sound="tnt_explode",
 						  disable_drops=true
 				 })
+				 ]]--
+				 bombutil.boom(p, "", {
+						  radius=3,
+						  explode_center=true,
+						  ignore_protection=false,
+						  ignore_on_blast_ents=true,
+						  ignore_on_blast_nodes=true,
+						  sound="tnt_explode",
+						  disable_drops=true
+				 })
+
 				 user:punch(user, nil, {
 					       full_punch_interval=1.5,
 					       max_drop_level=1,

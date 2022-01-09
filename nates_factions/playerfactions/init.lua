@@ -10,6 +10,11 @@ factions.version = 2
 
 local facts = {}
 local storage = minetest.get_mod_storage()
+
+-- Factions are stored in plain text rather than a database. The whole thing
+-- is loaded into memory on server start, and serialized multiple times during
+-- runtime. This should be fine for now, but it could become an issue with
+-- thousands of players/factions.
 if storage:get_string("facts") ~= "" then
    facts = minetest.deserialize(storage:get_string("facts"))
 end
@@ -52,6 +57,7 @@ function factions.player_is_in_faction(fname, player_name)
    return facts[fname].members[player_name]
 end
 
+-- This performs an O(n) search where n is the number of factions.
 function factions.get_player_factions(name)
    local player_factions = nil
    for fname, fact in pairs(facts) do
@@ -68,7 +74,7 @@ function factions.get_player_factions(name)
    
    if #player_factions > 1 and player_factions.mode_unique_faction == true then
       minetest.log("warning", "Player ".. name.." is a member of multiple factions with player_factions.mode_unique_faction=true")
-   end	 
+   end
 
    return player_factions
 end
