@@ -17,23 +17,10 @@ minetest.register_craftitem("climbglove:climb_glove", {
 				  end
 
 				  if user:get_velocity().y == 0 then
-				     print("User is on ground")
 				     jumpno = 0
 				  end
-				  print(jumpno)
-				  if jumpno > 2 then
-				     return
-				  end
-				  jumpno = jumpno+1
-
-				  --print(dump(user))
-				  if user:get_velocity().y < 6.5 then 
-				     user:add_velocity({x=0,y=6.5,z=0})
-				  end
-				  
+				  user:add_velocity({x=0,y=6.5,z=0})				  
 				  minetest.sound_play("dhit1", {pos = sound_pos, gain = 1.5, max_hear_distance = 8}, true) 
-				  --print(dump(user))
-				  
 				  return itemstack
 			       end
 })

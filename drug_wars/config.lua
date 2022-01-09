@@ -2,9 +2,9 @@
 drug_wars.ENABLE_CANNABIS = true 
 drug_wars.ENABLE_COCA = true
 drug_wars.ENABLE_OPIUMPOPPY = true
-drug_wars.ENABLE_INVSEARCH = true
+drug_wars.ENABLE_INVSEARCH = false
 drug_wars.ENABLE_MACHETES = true
-drug_wars.ENABLE_PIPES = true 
+drug_wars.ENABLE_PIPES = false
 
 --inventory search options
 drug_wars.INV_SEARCH_MAX_DISTANCE = 5

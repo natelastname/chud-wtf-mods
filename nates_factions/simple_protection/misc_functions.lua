@@ -50,11 +50,17 @@ sp.can_access = function(pos, player_name)
 
    -- A simple modification to give factions access to eachother's territory.
    -- Doesn't support the case where factions.mode_unique_faction=false.
+   -- MAJOR PROBLEM: If a player leaves a faction, they take all their territory with them
+   -- This can be fixed.
    if factions.get_player_faction(player_name) == factions.get_player_faction(data.owner) then
       return true
    end
 
+   -- Here is where we could add a check to see if members of both faction are online.
+   -- We could also do things like check the relative power of each faction.
+
    
+   return false
    
 end
 
