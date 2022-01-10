@@ -16,6 +16,7 @@ if income_enabled then
 				for _, player in ipairs(minetest.get_connected_players()) do
 					local name = player:get_player_name()
 					players_income[name] = income_count
+					minetest.chat_send_player(name, "[Currency] You have just received a $1 welfare check.")
 					minetest.log("info", "[Currency] basic income for "..name)
 				end
 			end

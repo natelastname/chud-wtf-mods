@@ -534,10 +534,8 @@ local function handle_command(name, param)
       minetest.chat_send_player(name, "Invite is not yet implemented. Use /f join <faction> <password>")
 
 
-      
 
    elseif action == "showclaim" then
-      -- Should not need to be modified.
       simple_protection.show(name)
    elseif action == "claimlist" then
       -- fixed hopefully 
