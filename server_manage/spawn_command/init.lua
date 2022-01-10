@@ -13,6 +13,13 @@ function teleport_to_spawn(name)
         -- just a check to prevent the server crashing
         return false
     end
+    local has_drugs, item = drug_wars.player_has_drugs(name)
+    if has_drugs == true then
+       minetest.chat_send_player(name, "You cannot teleport while carrying drug paraphernalia ("..item..")")
+       return
+    end
+
+    
     local pos = player:get_pos()
     if math.abs(spawn_command.pos.x-pos.x)<20 and math.abs(spawn_command.pos.z-pos.z)<20 then
         minetest.chat_send_player(name, "Already close to spawn!")

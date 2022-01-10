@@ -226,10 +226,12 @@ function factions.tp_f_home(player_name)
    local fname = factions.get_player_faction(player_name)
    if fname == nil then
       minetest.chat_send_player(player_name, "You are not a member of any faction. Create or join a faction first.")
+      return
    end
    local f_home = facts[fname].home
    if f_home == "" then
       minetest.chat_send_player(player_name, "Your faction does not have a home position. Set one using '/f sethome' first.")
+      return
    end
    player:set_pos(f_home)
    minetest.chat_send_player(player_name, "Teleported to faction home.")
@@ -551,13 +553,17 @@ local function handle_command(name, param)
       simple_protection.unclaim(name)
    elseif action == "unclaimall" then
       simple_protection.delete_all_claims(name)
-
-
-      
    elseif action == "sethome" then
       factions.set_f_home(name)
    elseif action == "home" then
+
+      local has_drugs, item = drug_wars.player_has_drugs(name)
+      if has_drugs == true then
+	 minetest.chat_send_player(name, "You cannot teleport while carrying drug paraphernalia ("..item..")")
+	 return
+      end
       factions.tp_f_home(name)
+      
    else
       minetest.chat_send_player(name, S("Unknown subcommand. Run '/help f' for help."))
    end
