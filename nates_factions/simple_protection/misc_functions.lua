@@ -52,7 +52,7 @@ sp.can_access = function(pos, player_name)
    -- Doesn't support the case where factions.mode_unique_faction=false.
    -- MAJOR PROBLEM: If a player leaves a faction, they take all their territory with them
    -- This can be fixed.
-   if factions.get_player_faction(player_name) == factions.get_player_faction(data.owner) then
+   if factions.get_player_faction(player_name) == data.owner then
       return true
    end
 
