@@ -52,7 +52,7 @@ function ExplosiveProjectile:on_step(dtime, moveresult)
 	 
 	 --[[
 	 bombutil.boom(p, self.owner_name, {
-			  radius=2,
+			  radius=3,
 			  explode_center=true,
 			  ignore_protection=false,
 			  ignore_on_blast_ents=true,
@@ -62,7 +62,7 @@ function ExplosiveProjectile:on_step(dtime, moveresult)
 	 })
 	 ]]--
 	 bombutil.boom(p, "", {
-			  radius=2,
+			  radius=3,
 			  explode_center=true,
 			  ignore_protection=false,
 			  ignore_on_blast_ents=true,

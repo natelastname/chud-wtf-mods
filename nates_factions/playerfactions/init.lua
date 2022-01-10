@@ -18,12 +18,8 @@ local storage = minetest.get_mod_storage()
 if storage:get_string("facts") ~= "" then
    facts = minetest.deserialize(storage:get_string("facts"))
 end
--- Fix factions
-for fname, fact in pairs(facts) do
-   if fact.members == nil then
-      fact.members = {}
-   end
-end
+-- Here, we could do some basic checks to make sure there are no invalid factions
+
 
 factions.mode_unique_faction = minetest.settings:get_bool("player_factions.mode_unique_faction", true)
 factions.max_members_list = tonumber(minetest.settings:get("player_factions.max_members_list")) or 50
@@ -158,6 +154,7 @@ function factions.disband_faction(fname)
    end
    facts[fname] = nil
    save_factions()
+   simple_protection.delete_faction_claims(fname)
    return true
 end
 
@@ -254,36 +251,19 @@ function factions.join(name, faction_name, password)
       end
 
 end
-function factions.disband(name, password)
-   local password = nil
-   local faction_name = nil
-   local own_factions = factions.get_administered_factions(name)
-   local number_factions = #own_factions
-   if number_factions == 0 then
-      minetest.chat_send_player(name, S("You are the owner of no faction."))
-   elseif #params == 1 then
-      minetest.chat_send_player(name, S("Missing password."))
-   elseif #params == 2 and number_factions == 1 then
-      password = params[2]
-      faction_name = own_factions[1]
-   elseif #params >= 3 then
-      faction_name = params[3]
-      password = params[2]
+function factions.disband(name)
+   local faction_name = factions.get_player_faction(name)
+
+   if faction_name == nil then
+      minetest.chat_send_player(name, "You are not a member of a faction.")
+      return
    end
-   if password == nil then
-      minetest.chat_send_player(name, S("Missing password."))
-   elseif faction_name == nil then
-      minetest.chat_send_player(name, S("You are the owner of many factions, you have to choose one of them: @1.", table.concat(own_factions, ", ")))
-   elseif not facts[faction_name] then
-      minetest.chat_send_player(name, S("This faction doesn't exists."))
-   elseif name ~= factions.get_owner(faction_name) and not minetest.get_player_privs(name).playerfactions_admin then
-      minetest.chat_send_player(name, S("Permission denied: You are not the owner of this faction, and don't have the playerfactions_admin privilege."))
-   elseif password ~= factions.get_password(faction_name) then
-      minetest.chat_send_player(name, S("Permission denied: Wrong password."))
-   else
-      factions.disband_faction(faction_name)
-      minetest.chat_send_player(name, S("Disbanded @1.", faction_name))
+   if facts[faction_name].owner ~= name then
+      minetest.chat_send_player(name, "Only the owner of a faction can disband.")
+      return
    end
+   factions.disband_faction(faction_name)
+   minetest.chat_send_player(name, S("Disbanded @1.", faction_name))
 end
 
 
@@ -470,7 +450,7 @@ function factions.chown_cmd(name, target)
    end
 end
 
-function force_join(name, target, faction_name)
+function factions.force_join(name, target, faction_name)
    if not minetest.get_player_privs(name).playerfactions_admin then
       minetest.chat_send_player(name, S("Permission denied: You can't use this command, playerfactions_admin priv is needed."))
       return
@@ -547,23 +527,35 @@ local function handle_command(name, param)
    elseif action == "forcejoin" then
       local target = params[2]
       local faction_name = params[3]
-      factions.forcejoin(name, target, faction_name)
+      factions.force_join(name, target, faction_name)
    elseif action == "debug" then
-      faction.debug(name)
+      factions.debug(name)
    elseif action == "invite" then
       minetest.chat_send_player(name, "Invite is not yet implemented. Use /f join <faction> <password>")
+
+
+      
+
    elseif action == "showclaim" then
+      -- Should not need to be modified.
       simple_protection.show(name)
    elseif action == "claimlist" then
+      -- fixed hopefully 
       simple_protection.list(name)
    elseif action == "radar" then
+      -- No idea if this will work
       simple_protection.radar(name)
    elseif action == "claim" then
+      -- This should now work
       simple_protection.claim(name)
    elseif action == "unclaim" then
+      -- This should now work
       simple_protection.unclaim(name)
    elseif action == "unclaimall" then
-      simple_protection.delete_self(name)
+      simple_protection.delete_all_claims(name)
+
+
+      
    elseif action == "sethome" then
       factions.set_f_home(name)
    elseif action == "home" then

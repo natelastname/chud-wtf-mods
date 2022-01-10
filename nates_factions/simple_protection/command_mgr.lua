@@ -64,16 +64,21 @@ function simple_protection.show(name)
 end
 
 local function check_ownership(name)
-	local player = minetest.get_player_by_name(name)
-	local data, index = simple_protection.get_claim(player:get_pos())
-	if not data then
-		return false, S("This area is not claimed yet.")
-	end
-	local priv = minetest.check_player_privs(name, {simple_protection=true})
-	if name ~= data.owner and not priv then
-		return false, S("You do not own this area.")
-	end
-	return true, data, index
+   local fact_name = factions.get_player_faction(name)
+   if fact_name == nil then
+      return false, "You have to be a member of a faction to claim land."
+   end
+   
+   local player = minetest.get_player_by_name(name)
+   local data, index = simple_protection.get_claim(player:get_pos())
+   if not data then
+      return false, S("This area is not claimed yet.")
+   end
+   local priv = minetest.check_player_privs(name, {simple_protection=true})
+   if fact_name ~= data.owner and not priv then
+      return false, S("You do not own this area.")
+   end
+   return true, data, index, fact_name
 end
 
 local function table_erase(t, e)
@@ -195,6 +200,13 @@ end)
 function simple_protection.claim(name)
    local player = minetest.get_player_by_name(name)
    local pos = player:get_pos()
+
+   local fact_name = factions.get_player_faction(name)
+   if fact_name == nil then
+      minetest.chat_send_player(name, "You are not a member of any faction. Join or create a faction to claim land.")
+   end
+   
+   
    if pos == nil then
       minetest.chat_send_player(name, "Unknown error.")
       return
@@ -202,7 +214,7 @@ function simple_protection.claim(name)
    
    if simple_protection.old_is_protected(pos, name) then
       minetest.chat_send_player(name,
-				S("This area is already protected by an other protection mod."))
+				S("This area is already protected by another protection mod."))
       return
    end
    if simple_protection.underground_limit then
@@ -225,11 +237,11 @@ function simple_protection.claim(name)
    local claims_max = simple_protection.max_claims
    
    if minetest.check_player_privs(name, {simple_protection=true}) then
-      -- Why...
+      -- No idea why this mod has this arbitrary rule 
       claims_max = claims_max * 2
    end
 
-   local claims, count = simple_protection.get_player_claims(name)
+   local claims, count = simple_protection.get_player_claims(fact_name)
    if count >= claims_max then
       minetest.chat_send_player(name,
 				S("You can not claim any further areas: Limit (@1) reached.",
@@ -237,7 +249,7 @@ function simple_protection.claim(name)
       return
    end
    simple_protection.update_claims({
-	 [index] = {owner=name, shared={}}
+	 [index] = {owner=fact_name, shared={}}
    })
 
    minetest.add_entity(simple_protection.get_center(pos), "simple_protection:marker")
@@ -247,12 +259,12 @@ end
 
 
 function simple_protection.unclaim(name)
-   local success, data, index = check_ownership(name)
+   local success, data, index, fact_name = check_ownership(name)
    if not success then
       minetest.chat_send_player(name, data)
       return success
    end
-   if simple_protection.claim_return and name == data.owner then
+   if simple_protection.claim_return and fact_name == data.owner then
       local player = minetest.get_player_by_name(name)
    end
    simple_protection.set_claim(nil, index)
@@ -261,8 +273,27 @@ function simple_protection.unclaim(name)
    return true
 end
 
--- Unclaim all land of a given player. "delete_self" is a misnomer.
-function simple_protection.delete_self(name)
+
+-- Unclaim all land of a given faction
+function simple_protection.delete_faction_claims(fact_name)
+   -- Delete all claims
+   local claims, count = simple_protection.get_player_claims(fact_name)
+   for index in pairs(claims) do
+      claims[index] = false
+   end
+   simple_protection.update_claims(claims)
+   return count
+end
+
+
+-- Unclaim all land of a given player's faction. 
+function simple_protection.delete_all_claims(name)
+   local fact_name = factions.get_player_faction(name)
+   if fact_name == nil then
+      minetest.chat_send_player(name, "You are not a member of any faction.")
+      return
+   end
+   -- I don't know what this part does, I don't think it matters
    local removed = {}
    if simple_protection.share[name] then
       simple_protection.share[name] = nil
@@ -270,13 +301,8 @@ function simple_protection.delete_self(name)
       simple_protection.save_share_db()
    end
 
-   -- Delete all claims
-   local claims, count = simple_protection.get_player_claims(name)
-   for index in pairs(claims) do
-      claims[index] = false
-   end
-   simple_protection.update_claims(claims)
-
+   local count = simple_protection.delete_faction_claims(fact_name)
+   
    if count > 0 then
       table.insert(removed, S("@1 claimed area(s)", tostring(count)))
    end
@@ -327,7 +353,13 @@ function simple_protection.list(name)
    local list = {}
    local width = simple_protection.claim_size
    local height = simple_protection.claim_height
-   local claims = simple_protection.get_player_claims(name)
+   local fact_name = factions.get_player_faction(name)
+   if fact_name == nil then
+      minetest.chat_send_player(name, "You are not a member of any faction.")
+      return
+   end
+   
+   local claims = simple_protection.get_player_claims(fact_name)
    for index in pairs(claims) do
       -- TODO: Add database-specific function to convert the index to a position
       local abs_pos = minetest.string_to_pos(index)

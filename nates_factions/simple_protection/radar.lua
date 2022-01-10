@@ -4,27 +4,15 @@ local S = sp.translator
 local data_cache
 
 local function colorize_area(name, force)
-	if force == "unclaimed" or not force and
-			not data_cache then
-		-- Area not claimed
-		return "[colorize:#FFF:50"
-	end
-	if force == "owner" or not force and
-			data_cache.owner == name then
-		return "[colorize:#0F0:180"
-	end
-	local is_shared = sp.is_shared
-	if force == "shared" or not force and (
-			   is_shared(data_cache, name)
-			or is_shared(data_cache.owner, name)) then
-		return "[colorize:#0F0:80"
-	end
-	if force == "*all" or not force and
-			is_shared(data_cache, "*all") then
-		return "[colorize:#00F:180"
-	end
-	-- Claimed but not shared
-	return "[colorize:#000:180"
+   if force == "unclaimed" or not force and not data_cache then
+      -- Area not claimed
+      return "[colorize:#FFF:50"
+   end
+   if force == "owner" or not force and data_cache.owner == name then
+      return "[colorize:#0F0:180"
+   end
+   -- Claimed but not shared
+   return "[colorize:#000:180"
 end
 
 local function combine_escape(str)
@@ -33,6 +21,10 @@ end
 
 function sp.radar(name)
    local player = minetest.get_player_by_name(name)
+
+   -- It's OK if fact_name is nil (meaning, the player is not in a faction.)
+   local fact_name = factions.get_player_faction(name)
+   
    local player_pos = player:get_pos()
    local pos = sp.get_location(player_pos)
    local map_w = 15 - 1
@@ -63,7 +55,7 @@ function sp.radar(name)
 	 end
 	 parts = parts .. string.format(":%i,%i=%s",
 					x * img_w, (map_w - z) * img_w,
-					combine_escape(img .. "^" .. colorize_area(name)))
+					combine_escape(img .. "^" .. colorize_area(fact_name)))
 	 -- Somewhat dirty hack for [combine. Escape everything
 	 -- to get the whole text passed into TextureSource::generateImage()
       end
@@ -97,7 +89,6 @@ function sp.radar(name)
       dir_label = S("East @1", "(X+)")
       dir_mod = "^[transformR90"
    end
-
    minetest.show_formspec(name, "covfefe",
 			  "size[10.5,7]" ..
 			     "button_exit[9.5,0;1,1;exit;X]" ..
