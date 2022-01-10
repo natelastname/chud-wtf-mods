@@ -6,6 +6,20 @@ local income_item = minetest.settings:get("currency.income_item") or "currency:m
 local income_count = tonumber(minetest.settings:get("currency.income_count")) or 1
 local income_period = tonumber(minetest.settings:get("currency.income_period")) or 720
 
+
+local function earn_income(player)
+   if not player or player.is_fake_player then return end
+   local name = player:get_player_name()
+
+   local income_count = players_income[name]
+   if income_count and income_count > 0 then
+      local inv = player:get_inventory()
+      inv:add_item("main", {name=income_item, count=income_count})
+      players_income[name] = nil
+      minetest.log("info", "[Currency] added basic income for "..name.." to inventory")
+   end
+end
+
 if income_enabled then
 	local timer = 0
 	if creative_income_enabled then
@@ -39,18 +53,6 @@ if income_enabled then
 		end)
 	end
 
-	local function earn_income(player)
-		if not player or player.is_fake_player then return end
-		local name = player:get_player_name()
-
-		local income_count = players_income[name]
-		if income_count and income_count > 0 then
-			local inv = player:get_inventory()
-			inv:add_item("main", {name=income_item, count=income_count})
-			players_income[name] = nil
-			minetest.log("info", "[Currency] added basic income for "..name.." to inventory")
-		end
-	end
 
 	--minetest.register_on_dignode(function(pos, oldnode, digger) earn_income(digger) end)
 	--minetest.register_on_placenode(function(pos, node, placer) earn_income(placer) end)
