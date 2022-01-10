@@ -88,74 +88,20 @@ currency.shop.exchange = function(meta)
 	meta:set_int("pl2step",0)]]
 end
 
-local check_stock = function(
-	pos
-)
-	local meta = minetest.get_meta(
-		pos
-	)
-	local minv = meta:get_inventory(
-	)
-	local gives = minv:get_list(
-		"owner_gives"
-	)
-	local can_exchange = true
-	for i, item in pairs(
-		gives
-	) do
-		if not minv:contains_item(
-			"stock",
-			item
-		) then
-			can_exchange = false
-		end
-	end
-	local owner = meta:get_string(
-		"owner"
-	)
-	if can_exchange then
-		meta:set_string(
-			"infotext",
-			S(
-				"Exchange shop (owned by @1)",
-				owner
-			)
-		)
-		local applicable = "currency:shop"
-		local node = minetest.get_node(
-			pos
-		)
-		if node.name == applicable then
-			return
-		end
-		node.name = applicable
-		minetest.swap_node(
-			pos,
-			node
-		)
-	else
-		meta:set_string(
-			"infotext",
-			S(
-				"Exchange shop (owned by @1)",
-				owner
-			) .. ", " .. S(
-				"out of stock"
-			)
-		)
-		local applicable = "currency:shop_empty"
-		local node = minetest.get_node(
-			pos
-		)
-		if node.name == applicable then
-			return
-		end
-		node.name = applicable
-		minetest.swap_node(
-			pos,
-			node
-		)
-	end
+local check_stock = function(pos)
+   local meta = minetest.get_meta(pos)
+   local minv = meta:get_inventory()
+   local gives = minv:get_list("owner_gives")
+   local can_exchange = true
+   local owner = meta:get_string("owner")
+   meta:set_string("infotext", S("Exchange shop (owned by @1)", owner))
+   local applicable = "currency:shop"
+   local node = minetest.get_node(pos)
+   if node.name == applicable then
+      return
+   end
+   node.name = applicable
+   minetest.swap_node(pos, node)
 end
 
 minetest.register_node("currency:shop", {
@@ -349,7 +295,7 @@ minetest.register_on_player_receive_fields(function(sender, formname, fields)
 					minv:add_item("customers_gave",item)
 				end
 				for i, item in pairs(gives) do
-					minv:remove_item("stock",item)
+					--minv:remove_item("stock",item)
 					pinv:add_item("customer_gets",item)
 				end
 				minetest.chat_send_player(name, S("Exchanged!"))

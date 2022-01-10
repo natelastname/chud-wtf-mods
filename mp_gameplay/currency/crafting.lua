@@ -12,14 +12,6 @@ if minetest.get_modpath("default") then
 	})
 
 	minetest.register_craft({
-		output = "currency:shop",
-		recipe = {
-			{"default:sign_wall"},
-			{"default:chest_locked"},
-		}
-	})
-
-	minetest.register_craft({
 		output = "currency:barter",
 		recipe = {
 			{"default:sign_wall"},
