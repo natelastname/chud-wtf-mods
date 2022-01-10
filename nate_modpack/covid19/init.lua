@@ -176,7 +176,7 @@ minetest.register_craftitem("covid19:vaccine_jj", {
 			       end
 })
 
-
+--[[
 minetest.register_craft({
       output = "covid19:vaccine_jj",
       recipe = {
@@ -185,3 +185,5 @@ minetest.register_craft({
 	 {"", "", ""},
       }
 })
+--]]
+
