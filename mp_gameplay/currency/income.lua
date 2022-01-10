@@ -17,6 +17,7 @@ if income_enabled then
 					local name = player:get_player_name()
 					players_income[name] = income_count
 					minetest.chat_send_player(name, "[Currency] You have just received a $1 welfare check.")
+					earn_income(player)
 					minetest.log("info", "[Currency] basic income for "..name)
 				end
 			end
@@ -51,7 +52,7 @@ if income_enabled then
 		end
 	end
 
-	minetest.register_on_dignode(function(pos, oldnode, digger) earn_income(digger) end)
-	minetest.register_on_placenode(function(pos, node, placer) earn_income(placer) end)
-	minetest.register_on_craft(function(itemstack, player, old_craft_grid, craft_inv) earn_income(player) end)
+	--minetest.register_on_dignode(function(pos, oldnode, digger) earn_income(digger) end)
+	--minetest.register_on_placenode(function(pos, node, placer) earn_income(placer) end)
+	--minetest.register_on_craft(function(itemstack, player, old_craft_grid, craft_inv) earn_income(player) end)
 end
