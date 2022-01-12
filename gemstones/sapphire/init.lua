@@ -2,33 +2,33 @@
 -- Ores/blocks --
 -----------------
 
-minetest.register_node("gs_sapphire:sapphire_block", {
+minetest.register_node("sapphire:sapphire_block", {
     description = ("Sapphire Block"),
-    tiles = {"gs_sapphire_block.png"},
+    tiles = {"sapphire_block.png"},
     is_ground_content = true,
     groups = {cracky = 3},
 })
 
-minetest.register_node("gs_sapphire:sapphire_ore", {
+minetest.register_node("sapphire:sapphire_ore", {
 	description = ("Sapphire Ore"),
-	tiles = {"default_stone.png^gs_sapphire_ore.png"},
+	tiles = {"default_stone.png^sapphire_ore.png"},
 	is_ground_content = true,
 	groups = {cracky = 3},
-	drop = "gs_sapphire:sapphire",
+	drop = "sapphire:sapphire",
 })
 
-minetest.register_craftitem("gs_sapphire:sapphire", {
+minetest.register_craftitem("sapphire:sapphire", {
 	description = ("Sapphire"),
-	inventory_image = "gs_sapphire.png",
+	inventory_image = "sapphire.png",
 })
 
 ------------
 -- Tools --
 ------------
 
-minetest.register_tool("gs_sapphire:sapphire_sword", {
+minetest.register_tool("sapphire:sapphire_sword", {
 	description = "Sapphire Sword",
-	inventory_image = "gs_sapphire_sword.png",
+	inventory_image = "sapphire_sword.png",
 	tool_capabilities = {
 		full_punch_interval = 0.5,
 		max_drop_level=1,
@@ -41,9 +41,9 @@ minetest.register_tool("gs_sapphire:sapphire_sword", {
 	groups = {sword = 1}
 })
 
-minetest.register_tool("gs_sapphire:sapphire_pickaxe", {
+minetest.register_tool("sapphire:sapphire_pickaxe", {
 	description = "Sapphire Pickaxe",
-	inventory_image = "gs_sapphire_pickaxe.png",
+	inventory_image = "sapphire_pickaxe.png",
 	tool_capabilities = {
 		full_punch_interval = 0.5,
 		max_drop_level=3,
@@ -56,9 +56,9 @@ minetest.register_tool("gs_sapphire:sapphire_pickaxe", {
 	groups = {pickaxe = 1}
 })
 
-minetest.register_tool("gs_sapphire:sapphire_axe", {
+minetest.register_tool("sapphire:sapphire_axe", {
 	description = "Sapphire Axe",
-	inventory_image = "gs_sapphire_axe.png",
+	inventory_image = "sapphire_axe.png",
 	tool_capabilities = {
 		full_punch_interval = 0.5,
 		max_drop_level=1,
@@ -71,9 +71,9 @@ minetest.register_tool("gs_sapphire:sapphire_axe", {
 	groups = {axe = 1}
 })
 
-minetest.register_tool("gs_sapphire:sapphire_shovel", {
+minetest.register_tool("sapphire:sapphire_shovel", {
 	description = "Sapphire Shovel",
-	inventory_image = "gs_sapphire_shovel.png",
+	inventory_image = "sapphire_shovel.png",
 	tool_capabilities = {
          full_punch_interval = 0.5,
 	     max_drop_level=1,
@@ -94,13 +94,35 @@ minetest.register_tool("gs_sapphire:sapphire_shovel", {
 
       minetest.register_ore({
 	          ore_type       = "scatter",
-	          ore            = "gs_sapphire:sapphire_ore",
+	          ore            = "sapphire:sapphire_ore",
 	          wherein        = "default:stone",
-	          clust_scarcity = gsconf.scarcity_sapphire_ore,
+	          clust_scarcity = 15 * 15 * 15,
 	          clust_num_ores = 4,
 	          clust_size     = 3,
 	          y_max          = -256,
 	          y_min          = -31000,
+	   })
+	   
+	  minetest.register_ore({
+		      ore_type       = "scatter",
+		      ore            = "sapphire:sapphire_ore",
+		      wherein        = "default:stone",
+		      clust_scarcity = 17 * 17 * 17,
+		      clust_num_ores = 4,
+		      clust_size     = 3,
+		      y_max          = -128,
+		      y_min          = -255,
+	   })
+
+	  minetest.register_ore({
+		       ore_type       = "scatter",
+		       ore            = "sapphire:sapphire_ore",
+		       wherein        = "default:stone",
+		       clust_scarcity = 15 * 15 * 15,
+		       clust_num_ores = 4,
+		       clust_size     = 3,
+		       y_max          = -256,
+		       y_min          = -31000,
 	   })
 
 -------------
@@ -110,101 +132,101 @@ minetest.register_tool("gs_sapphire:sapphire_shovel", {
 -- Tools
 
 minetest.register_craft({
-	output = "gs_sapphire:sapphire_sword",
+	output = "sapphire:sapphire_sword",
 	recipe = {
-		{"gs_sapphire:sapphire"},
-		{"gs_sapphire:sapphire"},
+		{"sapphire:sapphire"},
+		{"sapphire:sapphire"},
 		{"group:stick"},
 	}
 })
 
 minetest.register_craft({
-	output = "gs_sapphire:sapphire_pickaxe",
+	output = "sapphire:sapphire_pickaxe",
 	recipe = {
-		{"gs_sapphire:sapphire", "gs_sapphire:sapphire", "gs_sapphire:sapphire"},
+		{"sapphire:sapphire", "sapphire:sapphire", "sapphire:sapphire"},
 		{"", "group:stick", ""},
 		{"", "group:stick", ""},
 	}
 })
 
 minetest.register_craft({
-	output = "gs_sapphire:sapphire_shovel",
+	output = "sapphire:sapphire_shovel",
 	recipe = {
-		{"gs_sapphire:sapphire"},
+		{"sapphire:sapphirey"},
 		{"group:stick"},
 		{"group:stick"},
 	}
 })
 
 minetest.register_craft({
-	output = "gs_sapphire:sapphire_axe",
+	output = "sapphire:sapphire_axe",
 	recipe = {
-		{"gs_sapphire:sapphire", "gs_sapphire:sapphire"},
-		{"gs_sapphire:sapphire", "group:stick"},
+		{"sapphire:sapphire", "sapphire:sapphire"},
+		{"sapphire:sapphire", "group:stick"},
 		{"", "group:stick"},
 	}
 })
 
 minetest.register_craft({
-	output = "gs_sapphire:sapphire_block",
+	output = "sapphire:sapphire_block",
 	recipe = {
-		{"gs_sapphire:sapphire", "gs_sapphire:sapphire", "gs_sapphire:sapphire"},
-		{"gs_sapphire:sapphire", "gs_sapphire:sapphire", "gs_sapphire:sapphire"},
-		{"gs_sapphire:sapphire", "gs_sapphire:sapphire", "gs_sapphire:sapphire"},
+		{"sapphire:sapphire", "sapphire:sapphire", "sapphire:sapphire"},
+		{"sapphire:sapphire", "sapphire:sapphire", "sapphire:sapphire"},
+		{"sapphire:sapphire", "sapphire:sapphire", "sapphire:sapphire"},
 	}
 })
 
 minetest.register_craft({
-	output = "gs_sapphire:sapphire",
+	output = "sapphire:sapphire",
 	recipe = {
-        {"gs_sapphire:sapphire_block"}
+        {"sapphire:sapphire_block"}
 	}
 })
 
 -- Armor
 
 minetest.register_craft({
-	output = "gs_sapphire:helmet_sapphire",
+	output = "sapphire:helmet_sapphire",
 	recipe = {
-		{"gs_sapphire:sapphire", "gs_sapphire:sapphire", "gs_sapphire:sapphire"},
-		{"gs_sapphire:sapphire", "", "gs_sapphire:sapphire"},
+		{"sapphire:sapphire", "sapphire:sapphire", "sapphire:sapphire"},
+		{"sapphire:sapphire", "", "sapphire:sapphire"},
 		{"", "", ""},
 	}
 })
 
 minetest.register_craft({
-	output = "gs_sapphire:chestplate_sapphire",
+	output = "sapphire:chestplate_sapphire",
 	recipe = {
-		{"gs_sapphire:sapphire", "", "gs_sapphire:sapphire"},
-		{"gs_sapphire:sapphire", "gs_sapphire:sapphire", "gs_sapphire:sapphire"},
-		{"gs_sapphire:sapphire", "gs_sapphire:sapphire", "gs_sapphire:sapphire"},
+		{"sapphire:sapphire", "", "sapphire:sapphire"},
+		{"sapphire:sapphire", "sapphire:sapphire", "sapphire:sapphire"},
+		{"sapphire:sapphire", "sapphire:sapphire", "sapphire:sapphire"},
 	}
 })
 
 minetest.register_craft({
-	output = "gs_sapphire:leggings_sapphire",
+	output = "ruby:leggings_ruby",
 	recipe = {
-		{"gs_sapphire:sapphire", "gs_sapphire:sapphire", "gs_sapphire:sapphire"},
-		{"gs_sapphire:sapphire", "", "gs_sapphire:sapphire"},
-		{"gs_sapphire:sapphire", "", "gs_sapphire:sapphire"},
+		{"sapphire:sapphire", "sapphire:sapphire", "sapphire:sapphire"},
+		{"sapphire:sapphire", "", "sapphire:sapphire"},
+		{"sapphire:sapphire", "", "sapphire:sapphire"},
 	}
 })
 
 minetest.register_craft({
-	output = "gs_sapphire:boots_sapphire",
+	output = "sapphire:boots_sapphire",
 	recipe = {
-		{"gs_sapphire:sapphire", "", "gs_sapphire:sapphire"},
-		{"gs_sapphire:sapphire", "", "gs_sapphire:sapphire"},
+		{"sapphire:sapphire", "", "sapphire:sapphire"},
+		{"sapphire:sapphire", "", "sapphire:sapphire"},
 		{"", "", ""},
 	}
 })
 
 minetest.register_craft({
-	output = "gs_sapphire:shield_sapphire",
+	output = "sapphire:shield_sapphire",
 	recipe = {
-		{"gs_sapphire:sapphire", "", "gs_sapphire:sapphire"},
-		{"gs_sapphire:sapphire", "gs_sapphire:sapphire", "gs_sapphire:sapphire"},
-		{"", "gs_sapphire:sapphire", ""},
+		{"sapphire:sapphire", "", "sapphire:sapphire"},
+		{"sapphire:sapphire", "sapphire:sapphire", "sapphire:sapphire"},
+		{"", "sapphire:sapphire", ""},
 	}
 })
 
@@ -213,41 +235,41 @@ minetest.register_craft({
 -----------------------
 
 if minetest.get_modpath("3d_armor") then
-	armor:register_armor("gs_sapphire:helmet_sapphire", {
+	armor:register_armor("sapphire:helmet_sapphire", {
 		description = ("Sapphire Helmet"),
-		inventory_image = "gs_sapphire_helmet_inv.png",
+		inventory_image = "sapphire_helmet_inv.png",
 		groups = {armor_head=1, armor_heal=16, armor_use=70},
 		armor_groups = {fleshy=10},
 		damage_groups = {cracky=2, snappy=1, level=6},
     })
 
-	armor:register_armor("gs_sapphire:leggings_sapphire", {
+	armor:register_armor("sapphire:leggings_sapphire", {
 		description = ("Sapphire Leggings"),
-		inventory_image = "gs_sapphire_leggings_inv.png",
+		inventory_image = "sapphire_leggings_inv.png",
 		groups = {armor_legs=1, armor_heal=16, armor_use=70},
 		armor_groups = {fleshy=30},
 		damage_groups = {cracky=2, snappy=1, level=6},
 	})
 
-	armor:register_armor("gs_sapphire:chestplate_sapphire", {
+	armor:register_armor("sapphire:chestplate_sapphire", {
 		description = ("Sapphire Chestplate"),
-		inventory_image = "gs_sapphire_chestplate_inv.png",
+		inventory_image = "sapphire_chestplate_inv.png",
 		groups = {armor_torso=1, armor_heal=16, armor_use=70},
 		armor_groups = {fleshy=30},
 		damage_groups = {cracky=2, snappy=1, level=6},
 	})
 
-		armor:register_armor("gs_sapphire:boots_sapphire", {
+		armor:register_armor("sapphire:boots_sapphire", {
 		description = ("Sapphire Boots"),
-		inventory_image = "gs_sapphire_boots_inv.png",
+		inventory_image = "sapphire_boots_inv.png",
 		groups = {armor_feet=1, armor_heal=16, armor_use=70, physics_jump=0.5},
 		armor_groups = {fleshy=10},
 		damage_groups = {cracky=2, snappy=1, level=6},
 	})
 
-		armor:register_armor("gs_sapphire:shield_sapphire", {
+		armor:register_armor("sapphire:shield_sapphire", {
 			description = ("Sapphire Shield"),
-			inventory_image = "gs_sapphire_shield_inv.png",
+			inventory_image = "sapphire_shield_inv.png",
 			groups = {armor_shield=1, armor_heal=12, armor_use=70},
 			armor_groups = {fleshy=10},
 			damage_groups = {cracky=2, snappy=1, level=6},

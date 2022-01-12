@@ -2,33 +2,33 @@
 -- Ores/blocks --
 -----------------
 
-minetest.register_node("gs_emerald:emerald_block", {
+minetest.register_node("emerald:emerald_block", {
     description = ("Emerald Block"),
-    tiles = {"gs_emerald_block.png"},
+    tiles = {"emerald_block.png"},
     is_ground_content = true,
     groups = {cracky = 3},
 })
 
-minetest.register_node("gs_emerald:emerald_ore", {
+minetest.register_node("emerald:emerald_ore", {
 	description = ("Emerald Ore"),
-	tiles = {"default_stone.png^gs_emerald_ore.png"},
+	tiles = {"default_stone.png^emerald_ore.png"},
 	is_ground_content = true,
 	groups = {cracky = 3},
-	drop = "gs_emerald:emerald",
+	drop = "emerald:emerald",
 })
 
-minetest.register_craftitem("gs_emerald:emerald", {
+minetest.register_craftitem("emerald:emerald", {
 	description = ("Emerald"),
-	inventory_image = "gs_emerald.png",
+	inventory_image = "emerald.png",
 })
 
 ------------
 -- Tools --
 ------------
 
-minetest.register_tool("gs_emerald:emerald_sword", {
+minetest.register_tool("emerald:emerald_sword", {
 	description = "Emerald Sword",
-	inventory_image = "gs_emerald_sword.png",
+	inventory_image = "emerald_sword.png",
 	tool_capabilities = {
 		full_punch_interval = 0.5,
 		max_drop_level=1,
@@ -41,9 +41,9 @@ minetest.register_tool("gs_emerald:emerald_sword", {
 	groups = {sword = 1}
 })
 
-minetest.register_tool("gs_emerald:emerald_pickaxe", {
+minetest.register_tool("emerald:emerald_pickaxe", {
 	description = "Emerald Pickaxe",
-	inventory_image = "gs_emerald_pickaxe.png",
+	inventory_image = "emerald_pickaxe.png",
 	tool_capabilities = {
 		full_punch_interval = 0.5,
 		max_drop_level=3,
@@ -56,9 +56,9 @@ minetest.register_tool("gs_emerald:emerald_pickaxe", {
 	groups = {pickaxe = 1}
 })
 
-minetest.register_tool("gs_emerald:emerald_axe", {
+minetest.register_tool("emerald:emerald_axe", {
 	description = "Emerald Axe",
-	inventory_image = "gs_emerald_axe.png",
+	inventory_image = "emerald_axe.png",
 	tool_capabilities = {
 		full_punch_interval = 0.5,
 		max_drop_level=1,
@@ -71,9 +71,9 @@ minetest.register_tool("gs_emerald:emerald_axe", {
 	groups = {axe = 1}
 })
 
-minetest.register_tool("gs_emerald:emerald_shovel", {
+minetest.register_tool("emerald:emerald_shovel", {
 	description = "Emerald Shovel",
-	inventory_image = "gs_emerald_shovel.png",
+	inventory_image = "emerald_shovel.png",
 	tool_capabilities = {
          full_punch_interval = 0.5,
 	     max_drop_level=1,
@@ -94,15 +94,36 @@ minetest.register_tool("gs_emerald:emerald_shovel", {
 
       minetest.register_ore({
 	          ore_type       = "scatter",
-	          ore            = "gs_emerald:emerald_ore",
+	          ore            = "emerald:emerald_ore",
 	          wherein        = "default:stone",
-	          clust_scarcity = gsconf.scarcity_emerald_ore,
+	          clust_scarcity = 15 * 15 * 15,
 	          clust_num_ores = 4,
 	          clust_size     = 3,
 	          y_max          = -256,
 	          y_min          = -31000,
 	   })
+	   
+	  minetest.register_ore({
+		      ore_type       = "scatter",
+		      ore            = "emerald:emerald_ore",
+		      wherein        = "default:stone",
+		      clust_scarcity = 17 * 17 * 17,
+		      clust_num_ores = 4,
+		      clust_size     = 3,
+		      y_max          = -128,
+		      y_min          = -255,
+	   })
 
+	  minetest.register_ore({
+		       ore_type       = "scatter",
+		       ore            = "emerald:emerald_ore",
+		       wherein        = "default:stone",
+		       clust_scarcity = 15 * 15 * 15,
+		       clust_num_ores = 4,
+		       clust_size     = 3,
+		       y_max          = -256,
+		       y_min          = -31000,
+	   })
 
 -------------
 -- Crafts --
@@ -111,101 +132,101 @@ minetest.register_tool("gs_emerald:emerald_shovel", {
 -- Tools
 
 minetest.register_craft({
-	output = "gs_emerald:emerald_sword",
+	output = "emerald:emerald_sword",
 	recipe = {
-		{"gs_emerald:emerald"},
-		{"gs_emerald:emerald"},
+		{"emerald:emerald"},
+		{"emerald:emerald"},
 		{"group:stick"},
 	}
 })
 
 minetest.register_craft({
-	output = "gs_emerald:emerald_pickaxe",
+	output = "emerald:emerald_pickaxe",
 	recipe = {
-		{"gs_emerald:emerald", "gs_emerald:emerald", "gs_emerald:emerald"},
+		{"emerald:emerald", "emerald:emerald", "emerald:emerald"},
 		{"", "group:stick", ""},
 		{"", "group:stick", ""},
 	}
 })
 
 minetest.register_craft({
-	output = "gs_emerald:emerald_shovel",
+	output = "emerald:emerald_shovel",
 	recipe = {
-		{"gs_emerald:emerald"},
+		{"emerald:emerald"},
 		{"group:stick"},
 		{"group:stick"},
 	}
 })
 
 minetest.register_craft({
-	output = "gs_emerald:emerald_axe",
+	output = "emerald:emerald_axe",
 	recipe = {
-		{"gs_emerald:emerald", "gs_emerald:emerald"},
-		{"gs_emerald:emerald", "group:stick"},
+		{"emerald:emerald", "emerald:emerald"},
+		{"emerald:emerald", "group:stick"},
 		{"", "group:stick"},
 	}
 })
 
 minetest.register_craft({
-	output = "gs_emerald:emerald_block",
+	output = "emerald:emerald_block",
 	recipe = {
-		{"gs_emerald:emerald", "gs_emerald:emerald", "gs_emerald:emerald"},
-		{"gs_emerald:emerald", "gs_emerald:emerald", "gs_emerald:emerald"},
-		{"gs_emerald:emerald", "gs_emerald:emerald", "gs_emerald:emerald"},
+		{"emerald:emerald", "emerald:emerald", "emerald:emerald"},
+		{"emerald:emerald", "emerald:emerald", "emerald:emerald"},
+		{"emerald:emerald", "emerald:emerald", "emerald:emerald"},
 	}
 })
 
 minetest.register_craft({
-	output = "gs_emerald:emerald 9",
+	output = "emerald:emerald 9",
 	recipe = {
-		{"gs_emerald:emerald_block"},
+		{"emerald:emerald_block"},
 	}
 })
 
 -- Armor
 
 minetest.register_craft({
-	output = "gs_emerald:helmet_emerald",
+	output = "emerald:helmet_emerald",
 	recipe = {
-		{"gs_emerald:emerald", "gs_emerald:emerald", "gs_emerald:emerald"},
-		{"gs_emerald:emerald", "", "gs_emerald:emerald"},
+		{"emerald:emerald", "emerald:emerald", "emerald:emerald"},
+		{"emerald:emerald", "", "emerald:emerald"},
 		{"", "", ""},
 	}
 })
 
 minetest.register_craft({
-	output = "gs_emerald:chestplate_emerald",
+	output = "emerald:chestplate_emerald",
 	recipe = {
-		{"gs_emerald:emerald", "", "gs_emerald:emerald"},
-		{"gs_emerald:emerald", "gs_emerald:emerald", "gs_emerald:emerald"},
-		{"gs_emerald:emerald", "gs_emerald:emerald", "gs_emerald:emerald"},
+		{"emerald:emerald", "", "emerald:emerald"},
+		{"emerald:emerald", "emerald:emerald", "emerald:emerald"},
+		{"emerald:emerald", "emerald:emerald", "emerald:emerald"},
 	}
 })
 
 minetest.register_craft({
-	output = "gs_emerald:leggings_emerald",
+	output = "emerald:leggings_emerald",
 	recipe = {
-		{"gs_emerald:emerald", "gs_emerald:emerald", "gs_emerald:emerald"},
-		{"gs_emerald:emerald", "", "gs_emerald:emerald"},
-		{"gs_emerald:emerald", "", "gs_emerald:emerald"},
+		{"emerald:emerald", "emerald:emerald", "emerald:emerald"},
+		{"emerald:emerald", "", "emerald:emerald"},
+		{"emerald:emerald", "", "emerald:emerald"},
 	}
 })
 
 minetest.register_craft({
-	output = "gs_emerald:boots_emerald",
+	output = "emerald:boots_emerald",
 	recipe = {
-		{"gs_emerald:emerald", "", "gs_emerald:emerald"},
-		{"gs_emerald:emerald", "", "gs_emerald:emerald"},
+		{"emerald:emerald", "", "emerald:emerald"},
+		{"emerald:emerald", "", "emerald:emerald"},
 		{"", "", ""},
 	}
 })
 
 minetest.register_craft({
-	output = "gs_emerald:shield_emerald",
+	output = "emerald:shield_emerald",
 	recipe = {
-		{"gs_emerald:emerald", "", "gs_emerald:emerald"},
-		{"gs_emerald:emerald", "gs_emerald:emerald", "gs_emerald:emerald"},
-		{"", "gs_emerald:emerald", ""},
+		{"emerald:emerald", "", "emerald:emerald"},
+		{"emerald:emerald", "emerald:emerald", "emerald:emerald"},
+		{"", "emerald:emerald", ""},
 	}
 })
 
@@ -214,41 +235,41 @@ minetest.register_craft({
 -----------------------
 
 if minetest.get_modpath("3d_armor") then
-	armor:register_armor("gs_emerald:helmet_emerald", {
+	armor:register_armor("emerald:helmet_emerald", {
 		description = ("Emerald Helmet"),
-		inventory_image = "gs_emerald_helmet_inv.png",
+		inventory_image = "emerald_helmet_inv.png",
 		groups = {armor_head=1, armor_heal=16, armor_use=70},
 		armor_groups = {fleshy=10},
 		damage_groups = {cracky=2, snappy=1, level=6},
     })
 
-	armor:register_armor("gs_emerald:leggings_emerald", {
+	armor:register_armor("emerald:leggings_emerald", {
 		description = ("Emerald Leggings"),
-		inventory_image = "gs_emerald_leggings_inv.png",
+		inventory_image = "emerald_leggings_inv.png",
 		groups = {armor_legs=1, armor_heal=16, armor_use=70},
 		armor_groups = {fleshy=30},
 		damage_groups = {cracky=2, snappy=1, level=6},
 	})
 
-	armor:register_armor("gs_emerald:chestplate_emerald", {
+	armor:register_armor("emerald:chestplate_emerald", {
 		description = ("Emerald Chestplate"),
-		inventory_image = "gs_emerald_chestplate_inv.png",
+		inventory_image = "emerald_chestplate_inv.png",
 		groups = {armor_torso=1, armor_heal=16, armor_use=70},
 		armor_groups = {fleshy=30},
 		damage_groups = {cracky=2, snappy=1, level=6},
 	})
 
-		armor:register_armor("gs_emerald:boots_emerald", {
+		armor:register_armor("emerald:boots_emerald", {
 		description = ("Emerald Boots"),
-		inventory_image = "gs_emerald_boots_inv.png",
+		inventory_image = "emerald_boots_inv.png",
 		groups = {armor_feet=1, armor_heal=16, armor_use=70, physics_speed=1, physics_jump=1},
 		armor_groups = {fleshy=10},
 		damage_groups = {cracky=2, snappy=1, level=6},
 	})
 
-		armor:register_armor("gs_emerald:shield_emerald", {
+		armor:register_armor("emerald:shield_emerald", {
 			description = ("Emerald Shield"),
-			inventory_image = "gs_emerald_shield_inv.png",
+			inventory_image = "emerald_shield_inv.png",
 			groups = {armor_shield=1, armor_heal=12, armor_use=70},
 			armor_groups = {fleshy=10},
 			damage_groups = {cracky=2, snappy=1, level=6},
