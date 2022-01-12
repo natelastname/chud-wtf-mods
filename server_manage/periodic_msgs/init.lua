@@ -1,5 +1,5 @@
 periodic_msgs = {}
-periodic_msgs.interval_secs = 60
+periodic_msgs.interval_secs = 240
 periodic_msgs.msgs = {
    "You can raid other faction's bases using tools from the covid19 mod.",
    "Johnson and Johnson vaccines are throwable bombs found in dungeon chests.",
