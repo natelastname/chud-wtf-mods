@@ -96,34 +96,13 @@ minetest.register_tool("ruby:ruby_shovel", {
 	          ore_type       = "scatter",
 	          ore            = "ruby:ruby_ore",
 	          wherein        = "default:stone",
-	          clust_scarcity = 15 * 15 * 15,
+	          clust_scarcity = gsconf.scarcity_ruby_ore,
 	          clust_num_ores = 4,
 	          clust_size     = 3,
 	          y_max          = -256,
 	          y_min          = -31000,
 	   })
-	   
-	  minetest.register_ore({
-		      ore_type       = "scatter",
-		      ore            = "ruby:ruby_ore",
-		      wherein        = "default:stone",
-		      clust_scarcity = 17 * 17 * 17,
-		      clust_num_ores = 4,
-		      clust_size     = 3,
-		      y_max          = -128,
-		      y_min          = -255,
-	   })
 
-	  minetest.register_ore({
-		       ore_type       = "scatter",
-		       ore            = "ruby:ruby_ore",
-		       wherein        = "default:stone",
-		       clust_scarcity = 15 * 15 * 15,
-		       clust_num_ores = 4,
-		       clust_size     = 3,
-		       y_max          = -256,
-		       y_min          = -31000,
-	   })
 
 -------------
 -- Crafts --
