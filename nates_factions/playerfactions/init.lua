@@ -530,9 +530,6 @@ local function handle_command(name, param)
       local target = params[2]
       local faction_name = params[3]
       factions.force_join(name, target, faction_name)
-   elseif action == "crash" then
-      local X = nil
-      X:crash_server()
    elseif action == "debug" then
       factions.debug(name)
    elseif action == "invite" then
