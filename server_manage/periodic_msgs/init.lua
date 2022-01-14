@@ -9,11 +9,12 @@ periodic_msgs.msgs = {
    "Be very careful who you trust with your faction's password.",
    "If you forget your faction's password, the faction owner can retrieve it using /f info",
    "All doors placed in faction claimed territory are automatically protected.",
-   "All forms of chest protection have been disabled."
+   "All forms of chest protection have been disabled.",
+   "There is a 50% chance a random item modifier will be applied to any crafted tools."
 }
 periodic_msgs.counter = 0
 periodic_msgs.color = "#ff9999"
-periodic_msgs.label = "<Server> "
+periodic_msgs.label = "<http://chud.wtf> "
 
 function print_message()
    periodic_msgs.counter = periodic_msgs.counter + 1

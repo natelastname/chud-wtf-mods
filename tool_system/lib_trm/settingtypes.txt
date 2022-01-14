@@ -1,0 +1,8 @@
+#lib_trm settings
+
+
+#If enabled, will use MT v5.0+ built in translation system.  Disable will use intllib, mod provided intllib, or none, in that order. Defaults to false.
+lib_trm_engine_translation (If true, will use the MT v5.0+ built in translation system.  Disable will use intllib, mod provided intllib, or none, in that order. Defaults to false. true/false) bool false
+
+
+
