@@ -35,7 +35,7 @@ end
 local safemode = settings:get_bool("pvp_areas.safemode") or false
 local area_label = settings:get("pvp_areas.label") or "Defined area."
 -- if false Mob does Damage
-local mobsDoNoDamage = false
+local mobsDoNoDamage = true
 
 local pvp_areas_store = AreaStore()
 pvp_areas_store:from_file(pvp_areas_worlddir .. "/pvp_areas_store.dat")
