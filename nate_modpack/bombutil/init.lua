@@ -197,7 +197,7 @@ local function tnt_explode(pos, radius, ignore_protection,
       end
    end
    -- Skipping this block of code not because I have found that some mods (etherium) 
-   -- implement on_blast inapproa
+   -- implement on_blast innapropriately
    for _, queued_data in pairs(on_blast_queue) do
       local dist = math.max(1, vector.distance(queued_data.pos, pos))
       local intensity = (radius * radius) / (dist * dist)
@@ -218,11 +218,12 @@ local function entity_physics(pos, radius, ignore_on_blast_ents)
       if obj:is_player() then
 	 local dir = vector.normalize(vector.subtract(obj_pos, pos))
 	 local moveoff = vector.multiply(dir, 2 / dist * radius)
+	 moveoff = moveoff * 3
 	 obj:add_velocity(moveoff)
-	 obj:set_hp(obj:get_hp() - damage)
+	 -- Don't do this for now because it's abuseable
+	 --obj:set_hp(obj:get_hp() - damage)
       elseif not ignore_on_blast_ents then
 	 local luaobj = obj:get_luaentity()
-
 	 -- object might have disappeared somehow
 	 if luaobj then
 	    local do_damage = true
