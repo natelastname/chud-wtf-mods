@@ -218,7 +218,7 @@ local function entity_physics(pos, radius, ignore_on_blast_ents)
       if obj:is_player() then
 	 local dir = vector.normalize(vector.subtract(obj_pos, pos))
 	 local moveoff = vector.multiply(dir, 2 / dist * radius)
-	 moveoff = moveoff * 3
+	 moveoff = vector.multiply(moveoff, 2) 
 	 obj:add_velocity(moveoff)
 	 -- Don't do this for now because it's abuseable
 	 --obj:set_hp(obj:get_hp() - damage)
