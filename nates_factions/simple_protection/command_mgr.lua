@@ -254,7 +254,7 @@ function simple_protection.claim(name)
    })
 
    minetest.add_entity(simple_protection.get_center(pos), "simple_protection:marker")
-   minetest.chat_send_player(name, S("Congratulations! You now own this area."))
+   minetest.chat_send_player(name, S("Congratulations! You now own this area. (Claim number @1 / @2)", count+1, claims_max))
    return itemstack
 end
 
