@@ -113,7 +113,7 @@ function ctf_ranged.simple_register_gun(name, def)
 							    ammo = def.ammo or "ctf_ranged:ammo",
 							    rounds = def.rounds,
 							    _g_category = def.type,
-							    groups = {ranged = 1, [def.type] = 1, tier = def.tier or 1, not_in_creative_inventory = 1},
+							    groups = {ranged = 1, [def.type] = 1, tier = def.tier or 1, not_in_creative_inventory = nil},
 							    on_use = function(itemstack, user)
 							       if not ctf_ranged.can_use_gun(user, name) then
 								  minetest.sound_play("ctf_ranged_click", {pos = user:get_pos()}, true)
@@ -136,7 +136,7 @@ function ctf_ranged.simple_register_gun(name, def)
 							    loaded_def.inventory_image = def.texture
 							    loaded_def.inventory_overlay = def.texture_overlay
 							    loaded_def.wield_image = def.wield_texture or def.texture
-							    loaded_def.groups.not_in_creative_inventory = nil
+							    loaded_def.groups.not_in_creative_inventory = 1
 							    loaded_def.on_use = function(itemstack, user)
 							       if not ctf_ranged.can_use_gun(user, name) then
 								  minetest.sound_play("ctf_ranged_click", {pos = user:get_pos()}, true)
