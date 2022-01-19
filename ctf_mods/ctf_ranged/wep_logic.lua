@@ -148,7 +148,7 @@ function ctf_ranged.simple_register_gun(name, def)
 							       end
 							       -- Maybe it is not a good idea to network so many particles.
 							       -- Could be worth benchmarking the performance effects.
-							       cartridge_particles(user)
+							       --cartridge_particles(user)
 							       if def.automatic then
 								  if not rawf.enable_automatic(def.fire_interval, itemstack, user) then
 								     return
