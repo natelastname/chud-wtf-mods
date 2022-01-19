@@ -7,6 +7,10 @@ mobs_mc.override.spawn_height = {
 	nether_max = nether.DEPTH_CEILING
 }
 
+mobs_mc.override.items = {
+   arrow = "ctf_ranged:ammo",
+   bow="ctf_ranged:makarov"
+}
 
 print("mobs_mc_gameconfig:")
 print(nether.DEPTH_CEILING)
