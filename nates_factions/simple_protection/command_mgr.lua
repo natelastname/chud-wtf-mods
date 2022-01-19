@@ -204,6 +204,7 @@ function simple_protection.claim(name)
    local fact_name = factions.get_player_faction(name)
    if fact_name == nil then
       minetest.chat_send_player(name, "You are not a member of any faction. Join or create a faction to claim land.")
+      return
    end
    
    

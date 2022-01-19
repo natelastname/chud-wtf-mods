@@ -51,4 +51,4 @@ sp.area_list = true
 -- Limits the amount of claims per player
 -- Doubled limit for players with the 'simple_protection' privilege
 -- Type: Integer
-sp.max_claims = 200
+sp.max_claims = 20
