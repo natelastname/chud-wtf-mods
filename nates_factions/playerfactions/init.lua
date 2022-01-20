@@ -556,12 +556,11 @@ local function handle_command(name, param)
    elseif action == "sethome" then
       factions.set_f_home(name)
    elseif action == "home" then
-
-      local has_drugs, item = drug_wars.player_has_drugs(name)
-      if has_drugs == true then
-	 minetest.chat_send_player(name, "You cannot teleport while carrying drug paraphernalia ("..item..")")
+      
+      if tp_manage.can_teleport(name) == false then
 	 return
       end
+      
       factions.tp_f_home(name)
       
    else

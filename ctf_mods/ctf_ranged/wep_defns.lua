@@ -18,7 +18,7 @@
    - HMG: ctf_ranged:m60
    Tier 3:
    - pistol: ctf_ranged:deagle
-   - DMR: ctf_ranged:m2000
+   - DMR: ctf_ranged:m200
    - Shotgun: ctf_ranged:jackhammer
    - SMG: ctf_ranged:mp5
    - Rifle: ctf_ranged:scar
