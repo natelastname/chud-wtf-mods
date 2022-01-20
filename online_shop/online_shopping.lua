@@ -249,6 +249,12 @@ function online_shop.get_want(player, meta, pos)
 	
 	local node_inv = meta:get_inventory()
 	local node_inv_list = node_inv:get_list("owner_wants")
+
+	if node_inv_list == nil or inv_list == nil then
+	   -- This can happen if a shop is destroyed while in use
+	   return
+	end
+
 	
 	for _, stack in pairs(inv_list) do
 		owner_wants:remove_item("main", stack)
@@ -267,6 +273,11 @@ function online_shop.get_give(player, meta, pos)
 	
 	local node_inv = meta:get_inventory()
 	local node_inv_list = node_inv:get_list("owner_gives")
+
+	if node_inv_list == nil or inv_list == nil then
+	   -- This can happen if a shop is destroyed while in use
+	   return
+	end
 	
 	for _, stack in pairs(inv_list) do
 		owner_wants:remove_item("main", stack)

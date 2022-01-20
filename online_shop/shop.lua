@@ -91,20 +91,10 @@ minetest.register_node("online_shop:shop_server", {
 		else
 			minetest.chat_send_player(clicker:get_player_name(), "You do not own this shop server.")
 		end
-	end,
-	
+	end,	
 	can_dig = function(pos, player)
-		local meta = minetest.get_meta(pos)
-		local player_name = player:get_player_name()
-		
-		if meta:get_string("owner") == player_name then
-			return true
-		elseif minetest.check_player_privs(player_name, { online_shop_admin = true }) then
-			return true
-		end
-		
-		minetest.chat_send_player(player_name, "You do not own this shop server.")
-		return false
+	   -- Should it check protection here?
+	   return true
 	end
 })
 

@@ -23,7 +23,6 @@ local illegal_items = {
 
 -- Custom stuff
 function drug_wars.player_has_drugs(name)
-   print("Checking for drugs")
    local player = minetest.get_player_by_name(name)
    local inv = player:get_inventory()
    local slots = inv:get_lists()
