@@ -25,12 +25,3 @@ minetest.register_craftitem("climbglove:climb_glove", {
 			       end
 })
 
-
-minetest.register_craft({
-      output = "climbglove:climb_glove",
-      recipe = {
-	 {"", "default:paper", ""},
-	 {"", "default:paper", ""},
-	 {"", "", ""},
-      }
-})
