@@ -26,7 +26,6 @@ function online_shop.shopping_ui(index, player_name, owner_name)
 	--If started from command
 	if index == -1 then
 		index = 1
-		
 		local stores = online_shop.list_stores()
 		if table.concat(stores) ~= nil and table.concat(stores) ~= "" then
 			local player = minetest.get_player_by_name(player_name)
@@ -95,6 +94,7 @@ function online_shop.shopping_ui(index, player_name, owner_name)
 	return formspec
 end
 
+-- This handles the /online_shopping menu
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	if formname == "online_shop:os_formspec" then
 		local shop_index = 1
@@ -158,7 +158,7 @@ end)
 
 function online_shop.exchange(player, meta, pos)
 	local player_name = player:get_player_name()
-	print("Attempting exchange [".. player_name .. "]")
+	minetest.log("action", "[Online shopping] Attempting exchange [Customer:".. player_name .. "]")
 	--Get owner wants
 	local owner_wants = minetest.get_inventory({ type="detached", name="online_owner_wants_"..player_name })
 	local owner_wants_inv_list = owner_wants:get_list("main")
