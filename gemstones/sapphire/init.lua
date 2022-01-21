@@ -90,7 +90,7 @@ minetest.register_tool("sapphire:sapphire_shovel", {
 -- Mapgen --
 -----------------
 
--- Ruby Ore
+-- Sapphire Ore
 
       minetest.register_ore({
 	          ore_type       = "scatter",
@@ -183,7 +183,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output = "ruby:leggings_ruby",
+	output = "sapphire:leggings_sapphire",
 	recipe = {
 		{"sapphire:sapphire", "sapphire:sapphire", "sapphire:sapphire"},
 		{"sapphire:sapphire", "", "sapphire:sapphire"},

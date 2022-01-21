@@ -176,8 +176,8 @@ end
 
 ]]--
 function online_shop.register_shop(shop_def)
-   print("------------ Registering shop:")
-   print(dump(shop_def))
+   --print("------------ Registering shop:")
+   --print(dump(shop_def))
    
    if storage:get_string("stores_dict") == "" then
       set_val("stores_dict", {})
@@ -208,10 +208,10 @@ function online_shop.register_shop(shop_def)
    meta:set_string("item_label", shop_def.item_label)
    meta:set_string("owner", shop_def.owner)
 
-   print("------------- Stores Dict: -----------")
-   print(dump(get_val("stores_dict")))
-   print("------------- Groups Dict: -----------")
-   print(dump(get_val("groups_dict")))
+   --print("------------- Stores Dict: -----------")
+   --print(dump(get_val("stores_dict")))
+   --print("------------- Groups Dict: -----------")
+   --print(dump(get_val("groups_dict")))
    
    return true, "Shop " .. shop_def.store_name .. " successfully registered."
 end
