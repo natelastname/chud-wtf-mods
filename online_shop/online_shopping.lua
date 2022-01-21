@@ -1,159 +1,173 @@
+
+local contexts = {}
+
+local function get_context(name)
+   local context = contexts[name] or {}
+   contexts[name] = context
+   return context
+end
+
+
 minetest.register_chatcommand("online_shopping", {
-	params = "",
-	privs = { shout = true },
-	description = "Shows the online shopping interface.",
-	func = function(name, text)
-		local stores = online_shop.list_stores()
-		if table.concat(stores) ~= nil and table.concat(stores) ~= "" then
-			minetest.show_formspec(name, "online_shop:os_formspec", online_shop.shopping_ui(-1, name))
-		else
-			return false, "There are no stores."
-		end
-	end,
+				 params = "",
+				 privs = { shout = true },
+				 description = "Shows the online shopping interface.",
+				 func = function(name, text)
+				    local stores = online_shop.list_stores()
+				    if next(stores) then
+				       minetest.show_formspec(name, "online_shop:os_formspec", online_shop.shopping_ui(-1, name))
+				    else
+				       return false, "There are no stores."
+				    end
+				 end,
 })
 
+
+-- Display the /online_shopping menu
+-- "Index" is the selected shop 
 function online_shop.shopping_ui(index, player_name, owner_name)
-	--Get Inventories
-	local cust_gives = minetest.get_inventory({ type="detached", name="online_customer_gives_"..player_name })
-	local cust_gets = minetest.get_inventory({ type="detached", name="online_customer_gets_"..player_name })
-	local owner_wants = minetest.get_inventory({ type="detached", name="online_owner_wants_"..player_name })
-	local owner_gives = minetest.get_inventory({ type="detached", name="online_owner_gives_"..player_name })
-	cust_gives:set_size("main", 2*4)
-	cust_gets:set_size("main", 2*4)
-	owner_wants:set_size("main", 2*4)
-	owner_gives:set_size("main", 2*4)
-	
-	--If started from command
-	if index == -1 then
-		index = 1
-		local stores = online_shop.list_stores()
-		if table.concat(stores) ~= nil and table.concat(stores) ~= "" then
-			local player = minetest.get_player_by_name(player_name)
-			local player_meta = player:get_meta()
-			
-			local storename = online_shop.list_stores()[1]
-			player_meta:set_string("selected_shop_name", storename)
-			
-			local pos_list = online_shop.pos_list_as_table(storename)
-			local selected_pos = pos_list[index]
-			player_meta:set_string("selected_shop_pos", selected_pos)
-			
-			local pos = minetest.string_to_pos(selected_pos)
-			local meta = minetest.get_meta(pos)
-			online_shop.get_want(player, meta, pos)
-			online_shop.get_give(player, meta, pos)
-			
-			owner_name = online_shop.get_shop_owner(storename)
-		end
-	end
-	
-	--Shops
-	local list_stores = online_shop.list_stores()
-	local shopslist = o_s_methods.join_string(list_stores, ",")
-	
-	local items = {}
-	
-	local lss = table.concat(list_stores)
-	if lss ~= nil and lss ~= "" then
-		items = online_shop.get_item_labels(list_stores[index])
-	else
-		index = 1
-		items = { }
-	end
-	
-	--Owners name
-	if owner_name == nil then
-		owner_name = ""
-	end
-	
-	local available_items = o_s_methods.join_string(items, ",")
-	
-	local formspec = "size[14,12]"..
-		"label[0,0;Shops:]"..
-		"textlist[0,0.5;5,5;shops;"..shopslist..";"..index..";transparent]"..
-		"label[0,6;Items Sold:]"..
-		"textlist[0,6.5;5,5;shop_items;"..available_items..";1"..";transparent]"..
-		"label[0,11.5;Shop Owner: "..owner_name.."]"..
-		--"label[5.5,0;You give (Pay here):]"..
-		--"list[detached:online_customer_gives_"..player_name..";main;5.5,0.5;4,2;]"..
-		--"label[5.5,3;You got:]"..
-		--"list[detached:online_customer_gets_"..player_name..";main;5.5,3.5;4,2;]"..
-		"label[10,0;Owner Wants:]"..
-		"list[detached:online_owner_wants_"..player_name..";main;10,0.5;4,2;]"..
-		"label[10,3;In exchange, owner gives:]"..
-		"list[detached:online_owner_gives_"..player_name..";main;10,3.5;4,2;]"..
-		"button[5.5,6.5;4,0.8;exchange;Exchange]"..
-		"button_exit[10,6.5;4,0.8;exit;Exit]"..
-		"list[current_player;main;5.75,7.5;8,4;]"
-		
-	--If player is owner then add button
-	if player_name == owner_name then
-		--formspec = formspec.."button[10,5.7;4,0.8;manage;Manage]"
-	end
-	
-	return formspec
+   --Get Inventories
+   local cust_gives = minetest.get_inventory({ type="detached", name="online_customer_gives_"..player_name })
+   local cust_gets = minetest.get_inventory({ type="detached", name="online_customer_gets_"..player_name })
+   local owner_wants = minetest.get_inventory({ type="detached", name="online_owner_wants_"..player_name })
+   local owner_gives = minetest.get_inventory({ type="detached", name="online_owner_gives_"..player_name })
+   cust_gives:set_size("main", 2*4)
+   cust_gets:set_size("main", 2*4)
+   owner_wants:set_size("main", 2*4)
+   owner_gives:set_size("main", 2*4)
+   
+   --If started from command, show the first store
+   if index == -1 then
+      index = 1
+      local stores = online_shop.list_stores()
+      if next(stores) then
+	 local player = minetest.get_player_by_name(player_name)
+	 local player_meta = player:get_meta()
+	 
+	 local storename = online_shop.list_stores()[1]
+	 player_meta:set_string("selected_shop_name", storename)
+	 
+	 local pos_list = online_shop.pos_list_as_table(storename)
+	 local selected_pos = pos_list[index]
+	 player_meta:set_string("selected_shop_pos", selected_pos)
+	 
+	 local pos = minetest.string_to_pos(selected_pos)
+	 local meta = minetest.get_meta(pos)
+	 online_shop.get_want(player, meta, pos)
+	 online_shop.get_give(player, meta, pos)
+	 
+	 owner_name = online_shop.get_shop_owner(storename)
+      end
+   end
+   
+   local list_stores = online_shop.list_stores()
+   local shopslist = o_s_methods.join_string(list_stores, ",")
+   
+   local items = {}
+   
+   if next(list_stores) then
+      for k in pairs(online_shop.get_item_labels(list_stores[index])) do
+	    table.insert(items, k)
+      end
+   else
+      index = 1
+      items = { }
+   end
+   
+   --Owners name
+   if owner_name == nil then
+      owner_name = ""
+   end
+   
+   local available_items = o_s_methods.join_string(items, ",")
+   
+   local formspec = "size[14,12]"..
+      "label[0,0;Shops:]"..
+      "textlist[0,0.5;5,5;shops;"..shopslist..";"..index..";transparent]"..
+      "label[0,6;Items Sold:]"..
+      "textlist[0,6.5;5,5;shop_items;"..available_items..";1"..";transparent]"..
+      "label[0,11.5;Shop Owner: "..owner_name.."]"..
+      --"label[5.5,0;You give (Pay here):]"..
+      --"list[detached:online_customer_gives_"..player_name..";main;5.5,0.5;4,2;]"..
+      --"label[5.5,3;You got:]"..
+      --"list[detached:online_customer_gets_"..player_name..";main;5.5,3.5;4,2;]"..
+      "label[10,0;Owner Wants:]"..
+      "list[detached:online_owner_wants_"..player_name..";main;10,0.5;4,2;]"..
+      "label[10,3;In exchange, owner gives:]"..
+      "list[detached:online_owner_gives_"..player_name..";main;10,3.5;4,2;]"..
+      "button[5.5,6.5;4,0.8;exchange;Exchange]"..
+      "button_exit[10,6.5;4,0.8;exit;Exit]"..
+      "list[current_player;main;5.75,7.5;8,4;]"
+   
+   --If player is owner then add button
+   if player_name == owner_name then
+      --formspec = formspec.."button[10,5.7;4,0.8;manage;Manage]"
+   end
+   
+   return formspec
 end
 
 -- This handles the /online_shopping menu
 minetest.register_on_player_receive_fields(function(player, formname, fields)
-	if formname == "online_shop:os_formspec" then
-		local shop_index = 1
-		local player_meta = player:get_meta()
-		if fields.shops then
-			local shops_event = minetest.explode_textlist_event(fields.shops)
-			if shops_event.type == "CHG" then
-				local stores = online_shop.list_stores()
-				local storename = stores[shops_event.index]
-				player_meta:set_string("selected_shop_name", storename)
-				
-				if online_shop.store_exists(storename) == true then
-					local shop_owner = online_shop.get_shop_owner(storename)
-					local name = player:get_player_name()
-					shop_index = shops_event.index
-					local shopping_formspec = online_shop.shopping_ui(shop_index, name, shop_owner)
-					
-					local pos_list = online_shop.pos_list_as_table(storename)
-					local selected_pos = pos_list[1]
-					if selected_pos ~= nil and selected_pos ~= "" then
-						local meta = minetest.get_meta(minetest.string_to_pos(selected_pos))
-						online_shop.get_want(player, meta, minetest.string_to_pos(selected_pos))
-						online_shop.get_give(player, meta, minetest.string_to_pos(selected_pos))
-						player_meta:set_string("selected_shop_pos", selected_pos)
-					end
-					
-					minetest.show_formspec(name, "online_shop:os_formspec", shopping_formspec)
-				end
-			end
-		elseif fields.shop_items then
-			local shop_items_event = minetest.explode_textlist_event(fields.shop_items)
-			if shop_items_event.type == "CHG" then
-				local selected_shop_name = player_meta:get_string("selected_shop_name")
-				if selected_shop_name == nil or selected_shop_name == "" then
-					selected_shop_name = online_shop.list_stores()[1]
-				end
-				if selected_shop_name ~= nil and selected_shop_name ~= "" then
-					local pos_list = online_shop.pos_list_as_table(selected_shop_name)
-					local selected_pos = pos_list[shop_items_event.index]
-					local meta = minetest.get_meta(minetest.string_to_pos(selected_pos))
-					online_shop.get_want(player, meta, minetest.string_to_pos(selected_pos))
-					online_shop.get_give(player, meta, minetest.string_to_pos(selected_pos))
-					player_meta:set_string("selected_shop_pos", selected_pos)
-				end
-			end
-		elseif fields.exchange then
-			local selected_pos = player_meta:get_string("selected_shop_pos")
-			if selected_pos ~= nil and selected_pos ~= "" then
-				local pos = minetest.string_to_pos(selected_pos)
-				local meta = minetest.get_meta(pos)
-				online_shop.exchange(player, meta, pos)
-			end
-		elseif fields.manage then
-			local selected_shop_name = player_meta:get_string("selected_shop_name")
-			local selected_shop_pos = player_meta:get_string("selected_shop_pos")
-			local pos = minetest.string_to_pos(selected_shop_pos)
-			online_shop.open_shop_formspec(player:get_player_name(), pos)
-		end
-	end
+      if formname ~= "online_shop:os_formspec" then
+	 return
+      end
+      local shop_index = 1
+      local player_meta = player:get_meta()
+      if fields.shops then
+	 local shops_event = minetest.explode_textlist_event(fields.shops)
+	 if shops_event.type == "CHG" then
+	    local stores = online_shop.list_stores()
+	    local storename = stores[shops_event.index]
+	    player_meta:set_string("selected_shop_name", storename)
+	    
+	    if online_shop.store_exists(storename) == true then
+	       local shop_owner = online_shop.get_shop_owner(storename)
+	       local name = player:get_player_name()
+	       shop_index = shops_event.index
+	       local shopping_formspec = online_shop.shopping_ui(shop_index, name, shop_owner)
+	       
+	       local pos_list = online_shop.pos_list_as_table(storename)
+	       local selected_pos = pos_list[1]
+	       if selected_pos ~= nil and selected_pos ~= "" then
+		  local meta = minetest.get_meta(minetest.string_to_pos(selected_pos))
+		  online_shop.get_want(player, meta, minetest.string_to_pos(selected_pos))
+		  online_shop.get_give(player, meta, minetest.string_to_pos(selected_pos))
+		  player_meta:set_string("selected_shop_pos", selected_pos)
+	       end
+	       
+	       minetest.show_formspec(name, "online_shop:os_formspec", shopping_formspec)
+	    end
+	 end
+      elseif fields.shop_items then
+	 local shop_items_event = minetest.explode_textlist_event(fields.shop_items)
+	 if shop_items_event.type == "CHG" then
+	    local selected_shop_name = player_meta:get_string("selected_shop_name")
+	    if selected_shop_name == nil or selected_shop_name == "" then
+	       selected_shop_name = online_shop.list_stores()[1]
+	    end
+	    if selected_shop_name ~= nil and selected_shop_name ~= "" then
+	       local pos_list = online_shop.pos_list_as_table(selected_shop_name)
+	       local selected_pos = pos_list[shop_items_event.index]
+	       local meta = minetest.get_meta(minetest.string_to_pos(selected_pos))
+	       online_shop.get_want(player, meta, minetest.string_to_pos(selected_pos))
+	       online_shop.get_give(player, meta, minetest.string_to_pos(selected_pos))
+	       player_meta:set_string("selected_shop_pos", selected_pos)
+	    end
+	 end
+      elseif fields.exchange then
+	 local selected_pos = player_meta:get_string("selected_shop_pos")
+	 if selected_pos ~= nil and selected_pos ~= "" then
+	    local pos = minetest.string_to_pos(selected_pos)
+	    local meta = minetest.get_meta(pos)
+	    online_shop.exchange(player, meta, pos)
+	 end
+      elseif fields.manage then
+	 local selected_shop_name = player_meta:get_string("selected_shop_name")
+	 local selected_shop_pos = player_meta:get_string("selected_shop_pos")
+	 local pos = minetest.string_to_pos(selected_shop_pos)
+	 online_shop.open_shop_formspec(player:get_player_name(), pos)
+      end
 end)
 
 function online_shop.exchange(player, meta, pos)
