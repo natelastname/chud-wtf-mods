@@ -1,0 +1,3 @@
+#    If false then flying nodes are never thrown by explosions.
+explosions_flying_nodes (Flying Nodes) bool true
+ 
