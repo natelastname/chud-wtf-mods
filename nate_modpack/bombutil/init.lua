@@ -11,42 +11,67 @@
 -- - Particles are simplified
 bombutil = {}
 
--- loss probabilities array (one in X will be lost)
-local loss_prob = {}
 
-loss_prob["default:cobble"] = 3
-loss_prob["default:dirt"] = 4
+loss_probs = {}
+function set_blast_resistance(name, resistance)
+   if not minetest.registered_nodes[name].groups then
+      minetest.registered_nodes[name].groups = {}
+   end
+   minetest.registered_nodes[name].groups.blast_resistance = resistance
+   print(dump(minetest.registered_nodes[name]))
+end
 
+
+local resistances = {
+   ["default:obsidianbrick"] = 500,
+   ["basic_materials:brass_block"] = 1500,
+   ["default:copperblock"] = 1500,
+   ["default:bronzeblock"] = 1500,
+   ["default:tinblock"] = 1500,
+   ["default:steelblock"] = 1500,
+   ["moreores:silver_block"] = 1500,
+   ["ethereal:crystal_block"] = 1500,
+   ["default:mese"] = 1500, 
+   ["default:goldblock"] = 1500, 
+   ["moreores:mithril_block"] = 1500, 
+   ["ruby:ruby_block"] =1500, 
+   ["emerald:emerald_block"] = 1500, 
+   ["sapphire:sapphire_block"] = 1500, 
+   ["amethyst:amethyst_block"] = 1500, 
+   ["default:diamondblock"] = 1500
+}
 -- Fill a list with data for content IDs, after all nodes are registered
 local cid_data = {}
 minetest.register_on_mods_loaded(function()
+
+      for k in pairs(resistances) do
+	 explosions.set_blastres(k, resistances[k])
+      end
+
+      print("Computing blast resistances:")
       for name, def in pairs(minetest.registered_nodes) do
+	 local blast_res = explosions.get_blastres(def.name, def)
+	 if blast_res > 400 then
+	    print(name .. ": " .. tostring(blast_res))
+	 end
+	 local capabilities = minetest.registered_items["default:pick_steel"].tool_capabilities
+	 local params = minetest.get_dig_params(def.groups, capabilities)
+	 --print(dump(params))
+
+
+	 local p = 1
+	 if loss_probs[name] ~= nil then
+	    p = 1/loss_probs[name]
+	 end
 	 cid_data[minetest.get_content_id(name)] = {
 	    name = name,
 	    drops = def.drops,
+	    loss_prob = p,
 	    flammable = def.groups.flammable,
 	    on_blast = def.on_blast,
 	 }
       end
 end)
-
-local function rand_pos(center, pos, radius)
-   local def
-   local reg_nodes = minetest.registered_nodes
-   local i = 0
-   repeat
-      -- Give up and use the center if this takes too long
-      if i > 4 then
-	 pos.x, pos.z = center.x, center.z
-	 break
-      end
-      pos.x = center.x + math.random(-radius, radius)
-      pos.z = center.z + math.random(-radius, radius)
-      def = reg_nodes[minetest.get_node(pos).name]
-      i = i + 1
-   until def and not def.walkable
-end
-
 
 -- Called on each block in the blast radius
 local function destroy(npos, cid, c_air, on_blast_queue,
@@ -59,9 +84,8 @@ local function destroy(npos, cid, c_air, on_blast_queue,
 
    if not def then
       return c_air
-
-      -- If the block has an on_blast function, add that function to the queue
    elseif not ignore_on_blast and def.on_blast then
+      -- If the block has an on_blast function, add that function to on_blast_queue
       on_blast_queue[#on_blast_queue + 1] = {
 	 pos = vector.new(npos),
 	 on_blast = def.on_blast
@@ -117,13 +141,14 @@ local function add_effects(pos, radius)
 	 texture = "tnt_boom.png",
 	 glow = 15,
    })
+   local v = radius * 2
    minetest.add_particlespawner({
 	 amount = 64,
 	 time = 0.5,
 	 minpos = vector.subtract(pos, radius / 2),
 	 maxpos = vector.add(pos, radius / 2),
-	 minvel = {x = -10, y = -10, z = -10},
-	 maxvel = {x = 10, y = 10, z = 10},
+	 minvel = vector.new({x = -v, y = -v, z = -v}),
+	 maxvel = {x = v, y = v, z = v},
 	 minacc = vector.new(),
 	 maxacc = vector.new(),
 	 minexptime = 1,
@@ -163,10 +188,11 @@ local function tnt_explode(pos, radius, ignore_protection,
    for z = -radius, radius do
       for y = -radius, radius do
 	 local vi = a:index(pos.x + (-radius), pos.y + y, pos.z + z)
-	 for x = -radius, radius do
+	 for x = -radius, radius do	    
 	    local r = vector.length(vector.new(x, y, z))
-	    if (radius * radius) / (r * r) >= (pr:next(80, 125) / 100) then
-	       local cid = data[vi]
+	    --if (radius * radius) / (r * r) >= (pr:next(80, 125) / 100) then
+	    local cid = data[vi]
+	    if pr:next(1,100)/100 <= cid_data[cid].loss_prob then
 	       local p = {x = pos.x + x, y = pos.y + y, z = pos.z + z}
 	       if cid ~= c_air then
 		  data[vi] = destroy(p, cid, c_air, on_blast_queue,
@@ -253,34 +279,28 @@ local function entity_physics(pos, radius, ignore_on_blast_ents)
    end
 end
 
-function bombutil.boom(pos, owner, def)
 
-   
+-- Eventually this should be modified to use the raycasted explosions mod for the
+-- actual bomb logic instead of code derived from default:tnt. So, we will only
+-- use the sound/particles from default:tnt
+function bombutil.boom(pos, owner, def)
    def = def or {}
    def.radius = def.radius or 1
    def.damage_radius = def.damage_radius or def.radius * 2
-
+   if def.radius == 0 then
+      def.destroy_blocks = false
+   end
+   def.destroy_blocks = def.destroy_blocks or true 
+   
    -- Owner must be a player
    if owner == nil then
       minetest.log("action", "Bombutil explosion failed: owner was nil. (Pos:"
 		      .. minetest.pos_to_string(pos) .. " Radius " .. def.radius)
       return
    end
-
-   
-   if not def.explode_center and def.ignore_protection ~= true then
-      minetest.set_node(pos, {name = "tnt:boom"})
-   end
    local sound = def.sound or "tnt_explode"
    minetest.sound_play(sound, {pos = pos, gain = 2.5,
 			       max_hear_distance = math.min(def.radius * 20, 128)}, true)
-   local radius = tnt_explode(pos, def.radius, def.ignore_protection,
-			      def.ignore_on_blast_nodes, owner, def.explode_center)
    
-   local damage_radius = (radius / math.max(1, def.radius)) * def.damage_radius
-   entity_physics(pos, damage_radius, def.ignore_on_blast_ents)
-   add_effects(pos, radius)
-   minetest.log("action", "bombutil explosion owned by " .. owner .. " detonated at " ..
-		   minetest.pos_to_string(pos) .. " with radius " .. radius)
+   add_effects(pos, def.radius)
 end
-
