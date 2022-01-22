@@ -60,7 +60,7 @@ minetest.register_tool( 'covid19:decontaminator', {
 				 })
 				 ]]--
 				 bombutil.boom(p, "", {
-						  radius=3,
+						  radius=0,
 						  explode_center=true,
 						  ignore_protection=false,
 						  ignore_on_blast_ents=true,

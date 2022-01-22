@@ -182,3 +182,11 @@ register_vaccine("covid19:vaccine_pfizer", {
 		    blast_radius = 1.75,
 		    blast_strength = 100000
 })
+minetest.register_craft({
+      output = "covid19:vaccine_pfizer",
+      recipe = {
+	 {'mobs_mc:rotten_flesh','covid19:vaccine_jj','mobs_mc:rotten_flesh'},
+	 {'covid19:vaccine_jj','covid19:vaccine_jj','covid19:vaccine_jj'},
+	 {'mobs_mc:rotten_flesh','covid19:vaccine_jj','mobs_mc:rotten_flesh'}
+      }
+})
