@@ -40,6 +40,21 @@ local resistances = {
    ["amethyst:amethyst_block"] = 1500, 
    ["default:diamondblock"] = 1500
 }
+
+
+minetest.after(5, function()
+		  for name, def in pairs(minetest.registered_nodes) do
+		     local blast_res = explosions.get_blastres(def.name, def)
+		     if blast_res > 400 then
+			print(name .. ": " .. tostring(blast_res))
+		     end
+		     local capabilities = minetest.registered_items["default:pick_steel"].tool_capabilities
+		     local params = minetest.get_dig_params(def.groups, capabilities)
+		     --print(dump(params))
+		  end
+end)
+
+
 -- Fill a list with data for content IDs, after all nodes are registered
 local cid_data = {}
 minetest.register_on_mods_loaded(function()

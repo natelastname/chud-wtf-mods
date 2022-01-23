@@ -376,14 +376,16 @@ local function trace_explode(pos, strength, raydirs, radius)
       end
     end
     if not callback and not obj:is_player() then
-      local vel = obj:get_velocity()
-      local push = rstr * 0.05
+       local vel = obj:get_velocity()
+       if vel ~= nil then
+	  local push = rstr * 0.05
+	  
+	  vel.x = vel.x + odir_x * push
+	  vel.y = vel.y + odir_y * push
+	  vel.z = vel.z + odir_z * push
 
-      vel.x = vel.x + odir_x * push
-      vel.y = vel.y + odir_y * push
-      vel.z = vel.z + odir_z * push
-
-      obj:set_velocity(vel)
+	  obj:set_velocity(vel)
+       end
     end
     if not callback and obj:is_player() then
       local push = rstr * 0.05

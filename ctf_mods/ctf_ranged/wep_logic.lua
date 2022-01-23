@@ -109,6 +109,7 @@ end
 function ctf_ranged.simple_register_gun(name, def)
    minetest.register_tool(rawf.also_register_loaded_tool(name, {
 							    description = def.description,
+							    ctf_guns_scope_zoom = def.scope_zoom or nil,
 							    inventory_image = def.texture.."^[colorize:#F44:42",
 							    ammo = def.ammo or "ctf_ranged:ammo",
 							    rounds = def.rounds,
