@@ -404,7 +404,11 @@ local function trace_explode(pos, strength, raydirs, radius)
   for _, params in pairs(callbacks) do
     local idx = params.idx
 
-    if data[idx] ~= AIR_CID then
+
+
+    
+    if data[idx] ~= AIR_CID
+    and not minetest.is_protected(vector.new(params.npos_x, params.npos_y, params.npos_z), "") then
       local callback = params.callback
       local npos_x = params.npos_x
       local npos_y = params.npos_y
