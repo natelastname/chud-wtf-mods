@@ -1,9 +1,9 @@
 periodic_msgs = {}
-periodic_msgs.interval_secs = 240
+periodic_msgs.interval_secs = 300
 periodic_msgs.msgs = {
    "You can raid other faction's bases using tools from the covid19 mod.",
    "Johnson and Johnson vaccines are throwable bombs found in dungeon chests.",
-   "The decontaminator is a suicide bomb with a 1:5 chance of exploding when used.",
+   "Most metal blocks can only be destroyed using Pfizer vaccines.",
    "Type /help f to view a list of faction related commands.",
    "Factions cannot claim land below y=-200.",
    "Be very careful who you trust with your faction's password.",
