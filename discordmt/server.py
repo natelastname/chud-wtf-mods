@@ -9,10 +9,12 @@ import json
 import time
 import configparser
 import re
+import os
+
 
 config = configparser.ConfigParser()
-
-config.read('relay.conf')
+dirname = os.path.dirname(__file__)
+config.read(os.path.join(dirname, 'relay.conf'))
 
 class Queue():
     def __init__(self):
