@@ -3543,6 +3543,11 @@ end
 
 
 mobs.spawning_mobs = {}
+mobs.registered_on_mob_punched = {}
+
+function mobs:register_on_mob_punched(f)
+   table.insert(mobs.registered_on_mob_punched, f)
+end
 
 -- register mob entity
 function mobs:register_mob(name, def)
@@ -3556,6 +3561,17 @@ function mobs:register_mob(name, def)
 		collisionbox[5] = collisionbox[2] + 0.99
 	end
 
+	local hookable_do_punch = function(self, hitter, tflp, tool_capabilities, dir)
+
+	   for i, f in ipairs(mobs.registered_on_mob_punched) do
+	      f(self, hitter, tflp, tool_capabilities, dir)
+	   end
+	   
+	   if def.do_punch ~= nil then
+	      return def.do_punch(self, hitter, tlfp, tool_capabilities, dir)
+	   end
+	end 
+	
 minetest.register_entity(name, setmetatable({
 
 	stepheight = def.stepheight,
@@ -3660,7 +3676,7 @@ minetest.register_entity(name, setmetatable({
 
 	on_blast = def.on_blast, -- class redifinition
 
-	do_punch = def.do_punch,
+	do_punch = hookable_do_punch,
 
 	on_breed = def.on_breed,
 
