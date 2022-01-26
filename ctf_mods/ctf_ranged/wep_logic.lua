@@ -57,10 +57,13 @@ local function process_ray(ray, user, look_dir, def)
 	       })
 
 	       if def.liquid_travel_dist then
+		  -- Disabled due to a stack overflow when shooting quick sand
+		  --[[
 		  process_ray(rawf.bulletcast(
 				 def.bullet, hitpoint.intersection_point,
 				 vector.add(hitpoint.intersection_point, vector.multiply(look_dir, def.liquid_travel_dist)), true, false
 					     ), user, look_dir, def)
+		  --]]
 	       end
 	    end
 	 end
