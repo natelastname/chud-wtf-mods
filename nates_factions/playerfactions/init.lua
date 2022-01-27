@@ -534,9 +534,6 @@ local function handle_command(name, param)
       factions.debug(name)
    elseif action == "invite" then
       minetest.chat_send_player(name, "Invite is not yet implemented. Use /f join <faction> <password>")
-
-
-
    elseif action == "showclaim" then
       simple_protection.show(name)
    elseif action == "claimlist" then

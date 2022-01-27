@@ -182,6 +182,7 @@ register_vaccine("covid19:vaccine_pfizer", {
 		    blast_radius = 1.75,
 		    blast_strength = 100000
 })
+
 minetest.register_craft({
       output = "covid19:vaccine_pfizer",
       recipe = {
