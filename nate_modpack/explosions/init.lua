@@ -46,9 +46,15 @@ end
 -- otherwise calculate it from other node groups (like `crumbly',
 -- `dig_immediate' and `level').
 function explosions.get_blastres(name, def)
+  if node_br[minetest.get_content_id(name)] then
+    return node_br[minetest.get_content_id(name)]
+  end
+   
   if def and def.groups and def.groups.blast_resistance then
     return def.groups.blast_resistance
   end
+  
+  
   -- Each of the 4 levels of the block groups is assigned a level
   local instant_br = { [0] = math.huge, 25, 12.5, 6.25 }
   local oddly_br = { [0] = math.huge, 100, 75, 50 }
