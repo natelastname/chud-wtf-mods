@@ -847,7 +847,7 @@ end
 
 -- This is a neccessary wrapper to handle errors resulting from players logging off.
 -- Otherwise, some random player:get_pos() call could fail within handle_cheat_detection
--- when a player leaves the game and cause the  whole server to crash.
+-- when a player leaves the game and cause the whole server to crash.
 local function schedule_cheat_detect(time, func)
    minetest.after(time, function()
 		     local status, err = pcall(func)
@@ -1107,6 +1107,7 @@ minetest.register_on_punchplayer(function(player, hitter, punchtime)
 end)
 
 minetest.register_on_mods_loaded(function()
+      minetest.log("info", "[CHEAT DETECTION]: ====== Anticheat loaded ======")
       mobs:register_on_mob_punched(function(ent, hitter, tflp, tool_capabilities, dir)
 	    detect_killaura(ent, hitter, tflp)
 
