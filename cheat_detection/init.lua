@@ -362,11 +362,14 @@ end
 --Alert staff if goon is pulling hacks out of his own ass
 local function send_alert_to_serverstaff(suspect, suspicion)
 
-
-   --minetest.chat_send_all(minetest.colorize("#ffbd14" ,"*** "..os.date("%X")..":[CHEAT DETECTION]: Player ")..minetest.colorize("#FFFFFF", tostring(suspect))..minetest.colorize("#ffbd14" ," may be performing ")..minetest.colorize("#FF0004", tostring(suspicion))..minetest.colorize("#ffbd14" ," hacks!"))
-   if true then
-      --return
+   local suspect_is_staff = minetest.check_player_privs(suspect, {ban=true})
+   
+   if suspect_is_staff then
+      minetest.chat_send_player(suspect, minetest.colorize("#ffbd14" ,"*** "..os.date("%X")..":[CHEAT DETECTION]: ") .. tostring(suspicion))
+      return
    end
+
+
    
    local players = minetest.get_connected_players()
    for _,player in pairs(players) do
@@ -807,8 +810,8 @@ local function on_after_rtt()
       send_alert_to_serverstaff(pname, info.suspicion)
 
       if info.alert_sent == false then
-	 minetest.log("warning", "[CHEAT DETECTION]: Player "..pname.." have been flagged by the Server for possibly using a Hacked Client!")
-	 minetest.chat_send_player(pname, minetest.colorize("#ffbd14" ,"*** "..os.date("%X")..":[CHEAT DETECTION]: You have been flagged by the Server for possibly using a Hacked Client. Our server staff have been alerted!"))
+	 --minetest.log("warning", "[CHEAT DETECTION]: Player "..pname.." have been flagged by the Server for possibly using a Hacked Client!")
+	 --minetest.chat_send_player(pname, minetest.colorize("#ffbd14" ,"*** "..os.date("%X")..":[CHEAT DETECTION]: You have been flagged by the Server for possibly using a Hacked Client. Our server staff have been alerted!"))
 	 info.alert_sent = true
       end
 
@@ -964,8 +967,8 @@ local function handle_cheat_detection()
 			      send_alert_to_serverstaff(pname, info.suspicion)
 
 			      if info.alert_sent == false then
-				 minetest.log("warning", "[CHEAT DETECTION]: Player "..pname.." have been flagged by the Server for possibly using a Hacked Client!")
-				 minetest.chat_send_player(pname, minetest.colorize("#ffbd14" ,"*** "..os.date("%X")..":[CHEAT DETECTION]: You have been flagged by the Server for possibly using a Hacked Client. Our server staff have been alerted!"))
+				 --minetest.log("warning", "[CHEAT DETECTION]: Player "..pname.." have been flagged by the Server for possibly using a Hacked Client!")
+				 --minetest.chat_send_player(pname, minetest.colorize("#ffbd14" ,"*** "..os.date("%X")..":[CHEAT DETECTION]: You have been flagged by the Server for possibly using a Hacked Client. Our server staff have been alerted!"))
 				 info.alert_sent = true
 			      end
 
