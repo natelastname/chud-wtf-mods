@@ -362,10 +362,12 @@ end
 --Alert staff if goon is pulling hacks out of his own ass
 local function send_alert_to_serverstaff(suspect, suspicion)
 
-   local suspect_is_staff = minetest.check_player_privs(suspect, {ban=true})
    
-   if suspect_is_staff then
-      minetest.chat_send_player(suspect, minetest.colorize("#ffbd14" ,"*** "..os.date("%X")..":[CHEAT DETECTION]: ") .. tostring(suspicion))
+   if false then
+      local suspect_is_staff = minetest.check_player_privs(suspect, {ban=true})
+      if suspect_is_staff then
+	 minetest.chat_send_player(suspect, minetest.colorize("#ffbd14" ,"*** "..os.date("%X")..":[CHEAT DETECTION]: ") .. tostring(suspicion))
+      end
       return
    end
 
@@ -810,7 +812,7 @@ local function on_after_rtt()
       send_alert_to_serverstaff(pname, info.suspicion)
 
       if info.alert_sent == false then
-	 --minetest.log("warning", "[CHEAT DETECTION]: Player "..pname.." have been flagged by the Server for possibly using a Hacked Client!")
+	 minetest.log("warning", "[CHEAT DETECTION]: Player "..pname.." have been flagged for " .. info.suspicion)
 	 --minetest.chat_send_player(pname, minetest.colorize("#ffbd14" ,"*** "..os.date("%X")..":[CHEAT DETECTION]: You have been flagged by the Server for possibly using a Hacked Client. Our server staff have been alerted!"))
 	 info.alert_sent = true
       end
@@ -965,7 +967,8 @@ local function handle_cheat_detection()
 			   --Send Warning after 3 strikes, then reset. Following up with patience meter to drop
 			   if info.strikes == 3 and info.suspicion ~= "None" then
 			      send_alert_to_serverstaff(pname, info.suspicion)
-
+			      minetest.log("warning", "[CHEAT DETECTION]: Player "..pname.." have been flagged for " .. info.suspicion)
+			      
 			      if info.alert_sent == false then
 				 --minetest.log("warning", "[CHEAT DETECTION]: Player "..pname.." have been flagged by the Server for possibly using a Hacked Client!")
 				 --minetest.chat_send_player(pname, minetest.colorize("#ffbd14" ,"*** "..os.date("%X")..":[CHEAT DETECTION]: You have been flagged by the Server for possibly using a Hacked Client. Our server staff have been alerted!"))
