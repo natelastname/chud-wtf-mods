@@ -21,12 +21,15 @@ local automod_type = minetest.settings:get('cheat_detection_automod_type') or "b
 local automod_reason = minetest.settings:get('cheat_detection_automod_reason') or "Excessive Cheating Attempts"
 local cheat_detection_step = tonumber(minetest.settings:get("cheat_detection_step")) or 0
 local server_step = tonumber(minetest.settings:get("dedicated_server_step")) or 0.1
-local patience_meter = 3
+local patience_meter = 5
 local cheat_patience_meter = 3
 local node_under_height = 0.7
 local server_host = minetest.settings:get("name") or ""
 local detection_list = {}
 local debug_hud_list = {}
+
+
+local debug_mode = false
 
 if enable_automod and type(enable_automod) == "string" then
    if enable_automod == "true" then
@@ -79,6 +82,7 @@ end
 local function add_tracker(player)
    local name = player:get_player_name()
    if not detection_list[name] then
+      -- A lot of this crap is un
       detection_list[name] = {
 	 suspicion = "None",
 	 prev_pos = {x = 0, y = 0, z = 0},
@@ -94,7 +98,6 @@ local function add_tracker(player)
 	 unhold_sneak_time = 0,
 	 liquid_walk_time = 0,        
 	 flight_time = 0,
-	 time_resetted = false,
 	 falling_stops_time = 0,
 	 node_clipping_time = 0, 
 	 flying = false,
@@ -282,23 +285,23 @@ local function check_player_is_swimming(player)
    return result
 end
 
-
 local function is_solid_node_under(pos, max_height)
    local result = false
    local y_steps = 0
    local found = false
    while max_height > y_steps do
-      local node = minetest.get_node({x = pos.x, y = pos.y - y_steps, z = pos.z})
-      if node and minetest.registered_nodes[node.name] and minetest.registered_nodes[node.name].drawtype ~= "airlike" and minetest.registered_nodes[node.name].walkable == true then
-	 found = true
-	 result = true
-      elseif not minetest.registered_nodes[node.name] then --unknown block
-	 found = true
-	 result = true
+      local node = minetest.get_node_or_nil({x = pos.x, y = pos.y - y_steps, z = pos.z})
+      if node == nil then
+	 -- unloaded block
+	 return true
       end
-      if found then
-	 --print(node.name)
-	 break
+      if node.name == nil or minetest.registered_nodes[node.name] == nil then
+	 -- unknown block
+	 return true
+      end      
+      if minetest.registered_nodes[node.name].drawtype ~= "airlike" and minetest.registered_nodes[node.name].walkable == true then
+	 -- Some solid block
+	 return true
       end
       y_steps = y_steps + 1
    end
@@ -387,194 +390,169 @@ local function send_alert_to_serverstaff(suspect, suspicion)
    end
 end
 
+local function floatToInt(v, d)
 
-local function check_if_forced_flying(player, info, pos, velocity, avg_rtt)
-   local result = false
-
-   --Skip flight check if punched or logged in
-   if info.logged_in == true then
-      return result
-   elseif info.punched == true then  
-      return result
-   end
-
-   local name = player:get_player_name()
-   local can_fly = minetest.check_player_privs(name, {fly=true})
-   local min_speed = tonumber(minetest.settings:get("movement_speed_fast")) or 20
-   local min_jump = tonumber(minetest.settings:get("movement_speed_jump")) or 6.5
-   local speed_mod = tonumber(player:get_physics_override().speed)
-   local node_under = is_solid_node_under(pos, 1)
-   local sneak_hold = player:get_player_control().sneak or false
-   local object_under = check_obstacle_found_under(player, 1)
-   local suspicious = false
-   local delay = tonumber(patience_meter + avg_rtt)
-   local node_type = ""
-
-   min_speed = math.floor(speed_mod * min_speed)
+   local x
+   local y
+   local z
    
-   --Reset sneak unhold time if player is sneak glitching
-   if sneak_hold == true then
-      info.unhold_sneak_time = 0
+   if v.x > 0 then
+      x = d/2
+   else
+      x = d/-2
    end
 
-   -- print(node_under, object_under, sneak_hold)
+   if v.y > 0 then
+      y = d/2
+   else
+      y = d/-2
+   end
+   
+   if v.z > 0 then
+      z = d/2
+   else
+      z = d/-2
+   end
+   
+   local ret = vector.new({
+	 x = (v.x + x) / d,
+	 y = (v.y + y) / d,
+	 z = (v.z + z) / d
+   })
 
-   if info.flying == true then
-      suspicious = true
+   ret = vector.round(ret)
+
+   print(vector.to_string(ret))
+   
+   return vector.round(ret)
+   
+
+end
+
+
+local function check_if_forced_flying(player, info, pos, velocity, avg_rtt)      
+   
+   --Skip flight check if punched or logged in
+   if info.logged_in == true or info.punched == true then
+      info.hover_time = 0
+      return false
    end
 
-   --check if they are standing still while hovering in the air
-   if node_under == false and object_under == false and can_fly == false and pos.y == info.prev_pos.y and velocity.y == 0 and sneak_hold == false and info.flying == false then
-
-      local was_falling = info.falling or false
-
-      minetest.log("action", "[CHEAT DETECTION]: Player "..name.." triggered the Hover Check.")   
-      object_under = check_if_entity_under(pos)
-
-      --Prevent/skip false positive to trigger by unloaded block lag when falling too fast or when a object is underneath or if he/she just had loggen in to spare them from a aggressive detection
-      if was_falling == true or object_under == true then
-	 info.flight_time = 0
-	 info.falling_stops_time = 0
-
-	 if was_falling == true then
-	    info.falling = false
-	    minetest.log("action", "[CHEAT DETECTION]: Player "..name.." was falling down but was halted by unloaded blocks, No suspicious activity found.")
-	 elseif object_under == true then
-	    minetest.log("action", "[CHEAT DETECTION]: Player "..name.." is standing on a entity obstacle, No suspicious activity found.")
-	 end   
-	 return result
-      end
-
-      local nodes_around = check_surrounding_for_nodes(2, pos)
-
-      if nodes_around == false then
-	 info.unhold_sneak_time = info.unhold_sneak_time + 1
-      end
-
-      --print("Sneak Unhold Time: "..tostring(info.unhold_sneak_time)) 
-
-      --Get triggered if the player has been caught constantly hovering up in the air
-      if info.unhold_sneak_time >= delay then 
-	 minetest.log("warning", "[CHEAT DETECTION]: Player "..name.." is hovering, Server has marked this as suspicious activity!")
-	 suspicious = true
-      end
-
-      --Check if player is indeed flying
-   elseif node_under == false and object_under == false and can_fly == false and velocity.y > min_jump and info.flying == false then
-
-      if info.flying == true then
-	 return true
-      end
-
-      minetest.log("action", "[CHEAT DETECTION]: Player "..name.." triggered the Flight Check.")
-
-      --Reset Falling Stops Time due to Flight check
-      info.falling_stops_time = 0
-      info.unhold_sneak_time = 0
-      info.falling = false
-
-      --Check for vertical velocity change to determine if the player is actually flying
-      local new_velocity = player:get_velocity() 
-      --Get triggered if the player has been constantly climbing up for far too long at a very steady pace
-      if info.flight_time >= delay then  
-	 minetest.log("warning", "[CHEAT DETECTION]: Player "..name.." is continuously increasing vertical velocity too many times. Server has marked this as suspicious activity!")
-	 suspicious = true
-
-	 --If bastard is constantly acsending steadily at max speed, then he's flying like a little twat. add flight time
-      elseif new_velocity.y == min_speed then
-	 info.flight_time = info.flight_time + 1
-	 --If a player suddently begins dropping vertical velocity, then they might be falling
-      elseif new_velocity.y < info.prev_velocity.y then
-	 minetest.log("action", "[CHEAT DETECTION]: Player "..name.." seem to be dropping vertical velocity due to falling. No suspicious activity found.")
-
-	 --If a player is not flying, they can't be able to keep the same ammount of previous vertical velocity or constantly increasing their vertical velocity, if so they are really flying high
-      elseif new_velocity.y >= info.prev_velocity.y and new_velocity.y < min_speed then
-	 info.prev_velocity = new_velocity
-	 info.flight_time = info.flight_time + 1
-      end
-
-      --print("Flight Time: "..tostring(info.flight_time)) 
-
-
-      --Check if player is falling, or flying (false positives found)
-   elseif node_under == false and object_under == false and can_fly == false and velocity.y < -min_jump and info.flying == false then
-
-      if info.flying == true then
-	 return true
-      end
-
-      minetest.log("action", "[CHEAT DETECTION]: Player "..name.." triggered the Fall Check.") 
-
-      --Reset Flight Time due to Falling check
-      info.flight_time = 0
-      info.unhold_sneak_time = 0
-
-      --Check for vertical velocity change to determine if the player is actually flying
-      local new_velocity = player:get_velocity() 
-      
-      
-      --print(new_velocity.y, info.prev_velocity.y)
-
-      --If still falling, then stop this...
-      if info.falling == true then
-	 info.prev_velocity = new_velocity
-	 info.falling_stops_time = 0
-	 return result
-
-	 --Get triggered if the player has been constantly stopping from falling for far too long at a very steady pace
-      elseif info.falling_stops_time >= delay then  
-	 info.prev_velocity = new_velocity
-	 minetest.log("warning", "[CHEAT DETECTION]: Player "..name.." is continuously stopping from falling down too many times. Server has marked this as suspicious activity!")    
-	 suspicious = true
-
-	 --If bastard is constantly decsending steadily at max speed, then he's flying like a little twat. add falling stop time
-      elseif new_velocity.y == -min_speed then
-	 info.prev_velocity = new_velocity
-	 info.falling_stops_time = info.falling_stops_time + 1
-
-
-	 
-	 --if falling down, reset timer
-      elseif new_velocity.y < info.prev_velocity.y and new_velocity.y > -min_speed then
-	 info.prev_velocity = new_velocity
-	 info.falling_stops_time = 0
-
-	 --If a player suddently begins dropping vertical velocity above max speed, then they are indeed falling
-      elseif new_velocity.y < -min_speed then
-	 minetest.log("action", "[CHEAT DETECTION]: Player "..name.." is confirmed falling. No suspicious activity found.") 
-	 info.prev_velocity = new_velocity
-	 info.falling = true
-	 
-	 --If a player is falling, they can't be able to suddenly increase vertical velocity or make their velocity stay the same
-      elseif new_velocity.y >= info.prev_velocity.y then
-	 minetest.log("action", "[CHEAT DETECTION]: Player "..name.." suddenly stopped falling (Could be due to unloaded blocks or lag), verifying behavior...")
-	 info.prev_velocity = new_velocity
-	 info.falling_stops_time = info.falling_stops_time + 1
-      end
-
-      --Get triggered if the player has been constantly climbing up for far too long
-      if info.falling_stops_time >= delay then
-	 suspicious = true
-      end
-
-      --print("Fall Time: "..tostring(info.falling_stops_time)) 
-
-      --Just a normal player doing normal things, reset timers
-   elseif node_under == true or object_under == true then
-      suspicious = false
-      info.flying = false
-      info.falling = false
-      info.unhold_sneak_time = 0
-      info.flight_time = 0
-      info.falling_stops_time = 0
+   if velocity.y ~= 0 then
+      info.hover_time = 0
+      return false
    end
 
-   if suspicious == true then
-      info.flying = true
-      result = true
+   -- This is the boundary of a chunk, the player could be standing on an unloaded block.
+   -- Of course, this means that hackers could fly around along the boundaries of chunks,
+   -- but that's still better than being able to fly around anywhere
+   if math.round(pos.y) % 16 == 0 then
+      return false
+   end
+   
+   local name = player:get_player_name()
+   if debug_mode == false and minetest.check_player_privs(name, {fly=true}) == true then
+      info.hover_time = 0	    
+      return false
+   end
+   
+   local node_under = is_solid_node_under(pos, 1)
+   
+   if node_under == true then
+      info.hover_time = 0
+      return false
    end
 
-   return result
+   -- type can be node, entity
+   local object_under = get_obstacle_found_under(player, 1)
+   
+   if object_under ~= nil and (object_under.type == "node" or object_under.type == "entity") then
+      -- Is there an entity or node directly below the player?
+      info.hover_time = 0
+
+      return false
+   end
+
+   -- We have found no obvious node or entity below the player, yet they are not falling.
+   -- Perform a more comprehensive check.
+   if debug_mode then
+      print("================================================")
+      minetest.log("action", "[CHEAT DETECTION]: Player "..name.." triggered the Hover Check.")
+   end
+   
+   local near_nodes = check_surrounding_for_nodes(1, pos)
+   
+   if near_nodes == true then
+      minetest.log("action", "[CHEAT DETECTION]: Hover check of player "..name.." failed, they are near some solid node.")
+      info.hover_time = 0
+      return false
+   end
+   
+   local near_ent = check_if_entity_under(pos)
+
+   if near_ent == true then
+      -- They are near something solid.
+      minetest.log("action", "[CHEAT DETECTION]: Hover check of player "..name.." failed, they are near some solid entity.")
+      info.hover_time = 0
+      return false
+   end
+
+   -- This is based on the code Minetest uses internally to detect whether the player is climbing or not.
+   -- It is not perfect. Sometimes triggers when exiting a ladder at a particular angle.
+   -- This could be addressed by giving the player immunity on the first position recorded after exiting a ladder,
+   -- but for now we can simply trust that the delay is sufficiently large.
+   
+   
+   local pp1 = vector.add(pos, vector.new({x=0, y=0.5, z=0}))
+   local pp2 = vector.add(pos, vector.new({x=0, y=-0.2, z=0}))
+
+   if false and debug_mode then
+      print("exact pos:" .. vector.to_string(pos))
+      print("          " .. vector.to_string(vector.round(pos)))
+      print("      pp1:" .. vector.to_string(vector.round(pp1)))
+      print("          " .. vector.to_string(vector.round(pp1)))
+      print("      pp2:" .. vector.to_string(vector.round(pp2)))
+      print("          " .. vector.to_string(vector.round(pp2)))
+   end
+   
+   local climbable1 = minetest.registered_nodes[minetest.get_node(pp1).name].climbable or false
+   local climbable2 = minetest.registered_nodes[minetest.get_node(pp2).name].climbable or false
+
+  
+   if climbable1 or climbable2 then
+      minetest.log("action", "[CHEAT DETECTION]: Hover check of player "..name.." failed, they are on a climbable node.")
+      info.hover_time = 0
+      return false
+   end
+   
+   -- Prevent/skip false positive to trigger by unloaded block lag when falling too fast or when a object is
+   -- underneath or if he/she just had logged in to spare them from a aggressive detection
+   -- TODO: Test what happens when standing on an unloaded block, currently this doesn't work
+   local was_falling = info.falling or false
+   if was_falling == true then
+      info.hover_time = 0
+      minetest.log("action", "[CHEAT DETECTION]: Player "..name.." was falling down but was halted by unloaded blocks, No suspicious activity found.")
+      return false
+   end
+
+   
+
+   info.hover_time = info.hover_time + 1
+   local delay = tonumber(patience_meter + avg_rtt)
+
+
+   if debug_mode then
+      minetest.log("warning", "[CHEAT DETECTION]: Player "..name.." is detected as hovering ("..tostring(info.hover_time).."/"..tostring(delay)..")")
+   end
+   
+   if info.hover_time >= delay then
+      minetest.log("warning", "[CHEAT DETECTION]: Player "..name.." is detected as hovering!")
+      info.strikes = 3  
+      return true
+   end
+
+   return true
+
 end
 
 
@@ -597,7 +575,7 @@ local function check_if_forced_noclipping(player, info, pos, velocity, avg_rtt)
    local can_noclip = minetest.check_player_privs(name, {noclip=true})
    local inside_nodes = check_player_is_inside_nodes(player)
 
-   if can_noclip == true then
+   if debug_mode == false and can_noclip == true then
       return false
    end
    
@@ -615,17 +593,15 @@ local function check_if_forced_noclipping(player, info, pos, velocity, avg_rtt)
       info.prev_stuck_pos = current_pos
       return false
    end
-   
-   
-   local d = 0
 
-   -- The distance between the position the player was last recording being stuck
+   -- The distance between the position the player was first recorded being stuck
    -- and the current position.
+   local d = 0
    if info.prev_stuck_pos ~= nil then
       d = vector.length(vector.subtract(current_pos, info.prev_stuck_pos))
    end
    
-   if false and info.prev_stuck_pos ~= nil then
+   if debug_mode == true and info.prev_stuck_pos ~= nil then
       print("========== Possible noclip: ==========")
       print("is stuck:" .. tostring(info.stuck))
       print("Previous stuck pos: " .. vector.to_string(info.prev_stuck_pos))
@@ -746,20 +722,30 @@ local function verify_suspicious_behavior(info, suspicion, avg_rtt)
 end
 
 
-
-local function on_after_rtt()
-   info.time_resetted = false
+-- player, info, pos, velocity, pinfo.avg_rtt
+local function on_after_rtt(pname)
    
-   local player_phys_data = {
-      vel = player:get_velocity(),
-      pos = player:get_pos(),
-      name = player:get_player_name(),
-   }
+   local player = minetest.get_player_by_name(pname)
+   
+   if player == nil then
+      return
+   end
+
+   local info = get_tracker(player)
+   local pos = player:get_pos()
+   local velocity = player:get_velocity()
+
+   if pos == nil or velocity == nil then
+      return
+   end
+
+   local pinfo = minetest.get_player_information(pname) 
    
    local is_jesus_walking = check_if_jesus_walking(player, info, pos, velocity, pinfo.avg_rtt)
    local is_force_noclipping = check_if_forced_noclipping(player, info, pos, velocity, pinfo.avg_rtt)
    local is_force_fast = check_if_forced_fast(player, info)
    local is_force_flying = check_if_forced_flying(player, info, pos, velocity, pinfo.avg_rtt)
+   
    --Hmm, I sense suspicious activity in this sector... [Killaura]
    if info.killaura == true then
       verify_suspicious_behavior(info, "Killaura", pinfo.avg_rtt)
@@ -796,12 +782,10 @@ local function on_after_rtt()
       --Hmm, I sense suspicious activity in this sector... [Fly Hacks]
    elseif is_force_flying == true then
       verify_suspicious_behavior(info, "Forced Fly", pinfo.avg_rtt)
-
       --So far so good, nothing to see here (Reset timers and strikes)
    else
       info.patience_cooldown = info.patience_cooldown - 1
       if info.patience_cooldown < 1 then
-	 info.time_resetted = true
 	 info.automod_triggers = 0
 	 info.patience_cooldown = 2
       end
@@ -860,14 +844,14 @@ end
 -- This is a neccessary wrapper to handle errors resulting from players logging off.
 -- Otherwise, some random player:get_pos() call could fail within handle_cheat_detection
 -- when a player leaves the game and cause the whole server to crash.
-local function schedule_cheat_detect(time, func)
-   minetest.after(time, function()
-		     local status, err = pcall(func)
+local function schedule_cheat_detect(time, func, pname)
+   minetest.after(time, function(pname)
+		     local status, err = pcall(func, pname)
 		     if status == false then
 			minetest.log("warning", "[CHEAT DETECTION] Error, hopefully this was caused by a player leaving the game:")
 			minetest.log("warning", "[CHEAT DETECTION]".. err)
 		     end
-   end)
+   end, pname)
 end
 
 --Enable Server Anti-Cheat System if Player Manager is Present, keep an eye out for suspicious activity
@@ -876,14 +860,22 @@ local function handle_cheat_detection()
 
    for _,player in pairs(players) do
       local pname = player:get_player_name()
-      local pos = player:get_pos()
-      local velocity = player:get_velocity()      
       local is_superuser = minetest.check_player_privs(pname, {server=true})
       local pinfo = minetest.get_player_information(pname) --this is important
       local info = get_tracker(player)
       local smite = false
 
-      if pinfo and info and pname ~= server_host and is_superuser == false then
+      local skip_player = false
+
+      if pname == server_host or is_superuser then
+	 skip_player = true
+      end
+      if debug_mode then
+	 skip_player = false
+      end
+      
+      
+      if pinfo and info and skip_player == false then
 
 	 --If detection step is too fast, slow down the cooldown timer so some detection algorithms are less aggressive when a player reconnects to the server after jumping
 	 if info.logged_in == true and info.logged_in_cooldown > 0 and cheat_detection_step < 0.3 and server_step <= 0.1 then
@@ -910,108 +902,7 @@ local function handle_cheat_detection()
 	 end
 
 	 --Scan players every single average round trip time for accuracy
-	 schedule_cheat_detect(pinfo.avg_rtt, function()
-				  info.time_resetted = false
-			   
-			   local is_jesus_walking = check_if_jesus_walking(player, info, pos, velocity, pinfo.avg_rtt)
-			   local is_force_noclipping = check_if_forced_noclipping(player, info, pos, velocity, pinfo.avg_rtt)
-			   local is_force_fast = check_if_forced_fast(player, info)
-			   local is_force_flying = check_if_forced_flying(player, info, pos, velocity, pinfo.avg_rtt)
-			   --Hmm, I sense suspicious activity in this sector... [Killaura]
-			   if info.killaura == true then
-			      verify_suspicious_behavior(info, "Killaura", pinfo.avg_rtt)
-			      info.killaura_check = false
-			      info.killaura = false
-
-			      --Hmm, I sense suspicious activity in this sector... [Unlimited Range]
-			   elseif info.abnormal_range == true then
-			      verify_suspicious_behavior(info, "Unlimited Range", pinfo.avg_rtt)
-			      info.abnormal_range = false
-
-			      --Hmm, I sense suspicious activity in this sector... [Instant Break]
-			   elseif info.instant_break == true then
-			      verify_suspicious_behavior(info, "Instant Node Break", pinfo.avg_rtt)
-			      info.instant_break = false
-
-			      --Hmm, I sense suspicious activity in this sector... [Fast Dig]
-			   elseif info.fast_dig == true then
-			      verify_suspicious_behavior(info, "Fast Dig", pinfo.avg_rtt)
-			      info.fast_dig = false
-
-			      --Hmm, I sense suspicious activity in this sector... [Walk on Water Hacks]
-			   elseif is_jesus_walking == true then
-			      verify_suspicious_behavior(info, "Jesus Walk", pinfo.avg_rtt)
-
-			      --Hmm, I sense suspicious activity in this sector... [Noclip Hacks]
-			   elseif is_force_noclipping == true then
-			      verify_suspicious_behavior(info, "Forced Noclip", pinfo.avg_rtt)
-
-			      --Hmm, I sense suspicious activity in this sector... [Fast Hacks]
-			   elseif is_force_fast == true then
-			      verify_suspicious_behavior(info, "Forced Fast", pinfo.avg_rtt)
-
-			      --Hmm, I sense suspicious activity in this sector... [Fly Hacks]
-			   elseif is_force_flying == true then
-			      verify_suspicious_behavior(info, "Forced Fly", pinfo.avg_rtt)
-
-			      --So far so good, nothing to see here (Reset timers and strikes)
-			   else
-			      info.patience_cooldown = info.patience_cooldown - 1
-			      if info.patience_cooldown < 1 then
-				 info.time_resetted = true
-				 info.automod_triggers = 0
-				 info.patience_cooldown = 2
-			      end
-			   end
-
-			   --Send Warning after 3 strikes, then reset. Following up with patience meter to drop
-			   if info.strikes == 3 and info.suspicion ~= "None" then
-			      send_alert_to_serverstaff(pname, info.suspicion)
-			      minetest.log("warning", "[CHEAT DETECTION]: Player "..pname.." have been flagged for " .. info.suspicion)
-			      
-			      if info.alert_sent == false then
-				 --minetest.log("warning", "[CHEAT DETECTION]: Player "..pname.." have been flagged by the Server for possibly using a Hacked Client!")
-				 --minetest.chat_send_player(pname, minetest.colorize("#ffbd14" ,"*** "..os.date("%X")..":[CHEAT DETECTION]: You have been flagged by the Server for possibly using a Hacked Client. Our server staff have been alerted!"))
-				 info.alert_sent = true
-			      end
-
-			      if enable_automod == true then
-				 local delay = tonumber(patience_meter + pinfo.avg_rtt)
-				 info.automod_triggers = info.automod_triggers + 1
-
-				 if info.automod_triggers >= delay then
-				    smite = true
-				 end
-			      end
-			      info.strikes = 0
-			   elseif info.strikes == 3 and info.suspicion == "None" then
-			      info.strikes = 0
-			   end
-
-			   --I ran out of patience, please for the love of god Let me BAN this sneaky little twat NOW!!!
-			   if smite and enable_automod == true then
-			      info.automod_triggers = 0
-
-			      if automod_type == "kick" then
-
-				 minetest.log("action", "[CHEAT DETECTION]: Server has kicked "..pname.." for performing continuous abnormal behaviors while in-game.")
-				 minetest.kick_player(pname, "Cheat Detection: "..automod_reason)
-
-			      elseif automod_type == "ban" then
-				 
-				 minetest.log("action", "[CHEAT DETECTION]: Server has banned "..pname.." for performing continuous abnormal behaviors while in-game.")
-				 minetest.ban_player(pname)
-				 
-			      end
-
-			   end
-			   
-			   info.punched = false
-			   info.prev_velocity = velocity
-			   info.prev_pos = pos
-			   update_tracker_info(player, info)
-			   
-	 end)
+	 schedule_cheat_detect(pinfo.avg_rtt, on_after_rtt, pname)
 
       end
 
@@ -1123,6 +1014,5 @@ minetest.register_on_mods_loaded(function()
       minetest.log("info", "[CHEAT DETECTION]: ====== Anticheat loaded ======")
       mobs:register_on_mob_punched(function(ent, hitter, tflp, tool_capabilities, dir)
 	    detect_killaura(ent, hitter, tflp)
-
       end)
 end)
