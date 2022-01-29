@@ -29,7 +29,17 @@ local detection_list = {}
 local debug_hud_list = {}
 
 
+-- Debug mode:
+-- Allow staff members to trigger cheat detection, log a lot more info
 local debug_mode = false
+
+-- Test mode:
+-- Broadcast cheat accusations in global chat with a cooldown of chat_interval seconds between
+-- accusations of the same player. Do not punish anybody for anything.
+local test_mode = true
+local chat_interval = 5
+local chat_cooldown = ctf_core.init_cooldowns()
+
 
 if enable_automod and type(enable_automod) == "string" then
    if enable_automod == "true" then
@@ -366,14 +376,15 @@ end
 local function send_alert_to_serverstaff(suspect, suspicion)
 
    
-   if false then
-      local suspect_is_staff = minetest.check_player_privs(suspect, {ban=true})
-      if suspect_is_staff then
-	 minetest.chat_send_player(suspect, minetest.colorize("#ffbd14" ,"*** "..os.date("%X")..":[CHEAT DETECTION]: ") .. tostring(suspicion))
-      end
+   if test_mode and not chat_cooldown:get(suspect) then
+      minetest.chat_send_all("[CHEAT DETECTION (beta)]: ".. tostring(suspect) .. " accused of '" .. tostring(suspicion) .. "'")
+      chat_cooldown:set(suspect, chat_interval)
       return
    end
 
+   if true then
+      return
+   end
 
    
    local players = minetest.get_connected_players()
@@ -740,10 +751,13 @@ local function on_after_rtt(pname)
    end
 
    local pinfo = minetest.get_player_information(pname) 
-   
-   local is_jesus_walking = check_if_jesus_walking(player, info, pos, velocity, pinfo.avg_rtt)
+
+   -- Turned off for being broken
+   --local is_jesus_walking = check_if_jesus_walking(player, info, pos, velocity, pinfo.avg_rtt)
+   local is_jesus_walking = false
    local is_force_noclipping = check_if_forced_noclipping(player, info, pos, velocity, pinfo.avg_rtt)
-   local is_force_fast = check_if_forced_fast(player, info)
+   --local is_force_fast = check_if_forced_fast(player, info)
+   local is_force_fast = false
    local is_force_flying = check_if_forced_flying(player, info, pos, velocity, pinfo.avg_rtt)
    
    --Hmm, I sense suspicious activity in this sector... [Killaura]
@@ -927,7 +941,7 @@ minetest.register_on_joinplayer(function(player)
 end)
 
 
---Additional Anti-Hackerman stuff
+-- Handle the built-in Minetest cheat detection
 minetest.register_on_cheat(function(player, cheat)
       local info = get_tracker(player)
 
@@ -938,36 +952,34 @@ minetest.register_on_cheat(function(player, cheat)
 
       local name = player:get_player_name()
       local pinfo = minetest.get_player_information(name)
-      local delay = tonumber(cheat_patience_meter + pinfo.avg_rtt)
       local accusation = nil
+
+      if pinfo == nil then
+	 return
+      end
+      
+      if name == nil then
+	 return
+      end
 
       if cheat.type == "interacted_too_far" then
 	 info.anticheat_callout_time = info.anticheat_callout_time + 1
 	 accusation = "unlimitedrange"
-      elseif cheat.type == "dug_unbreakable" then
+	 send_alert_to_serverstaff(name, accusation)
+	 return
+      end
+      if cheat.type == "dug_unbreakable" then
 	 info.anticheat_callout_time = info.anticheat_callout_time + 1 
 	 accusation = "instantbreak"
-      elseif cheat.type == "dug_too_fast" then
+	 send_alert_to_serverstaff(name, accusation)
+	 return
+      end
+      if cheat.type == "dug_too_fast" then
 	 info.anticheat_callout_time = info.anticheat_callout_time + 1
-	 accusation = "fastdig" 
+	 accusation = "fastdig"
+	 send_alert_to_serverstaff(name, accusation)
+	 return
       end
-
-      --Hackers normally do things very quickly
-      if accusation and info.anticheat_callout_time > delay then
-	 if accusation == "instantbreak" then
-	    info.instant_break = true
-	    minetest.log("warning", "[CHEAT DETECTION]: Player "..name.." is trying to instantly break unbreakable nodes too many times. Server has marked this as suspicious activity!")    
-	 elseif accusation == "fastdig" then
-	    info.fast_dig = true
-	    minetest.log("warning", "[CHEAT DETECTION]: Player "..name.." is trying to instantly dig nodes too many times. Server has marked this as suspicious activity!")   
-	 elseif accusation == "unlimitedrange" then
-	    info.abnormal_range = true
-	    minetest.log("warning", "[CHEAT DETECTION]: Player "..name.." is trying to do long range interactions too many times. Server has marked this as suspicious activity!")    
-	 end
-
-	 info.anticheat_callout_time = 0
-      end
-
 end)
 
 function detect_killaura(player, hitter, punchtime)
