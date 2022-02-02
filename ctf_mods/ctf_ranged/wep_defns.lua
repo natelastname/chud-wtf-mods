@@ -126,7 +126,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:glock17", {
 				  type = "pistol",
 				  description = "Glock 17",
 				  texture = "rangedweapons_glock17.png",
-				  fire_sound = "ctf_ranged_mp5fire",
+				  fire_sound = "ctf_ranged_glock",
 				  rounds = 17,
 				  range = 75,
 				  damage = 3,
@@ -222,7 +222,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:deagle", {
 				  type = "pistol",
 				  description = "IMI Desert Eagle",
 				  texture = "rangedweapons_deagle.png",
-				  fire_sound = "ctf_ranged_mp5fire",
+				  fire_sound = "ctf_ranged_deagle",
 				  rounds = 8,
 				  range = 75,
 				  damage = 5,
@@ -329,3 +329,37 @@ ctf_ranged.simple_register_gun("ctf_ranged:python", {
 })
 
 
+
+ctf_ranged.simple_register_gun("ctf_ranged:deagle_gold", {
+				  type = "smg",
+				  description = "Gold Deagle",
+				  texture = "rangedweapons_golden_deagle.png",
+				  fire_sound = "ctf_ranged_deagle",
+				  bullet = {
+				     spread = 1.25,
+				     amount = 3
+				  },
+				  automatic = false,
+				  rounds = 16,
+				  range = 150,
+				  damage = 10,
+				  fire_interval = 0.5,
+				  liquid_travel_dist = 2,
+})
+
+ctf_ranged.simple_register_gun("ctf_ranged:g11", {
+				  type = "smg",
+				  description = "HK G11",
+				  texture = "rangedweapons_g11.png",
+				  fire_sound = "ctf_ranged_mk23fire",
+				  bullet = {
+				     spread = 1.25,
+				     amount = 3
+				  },
+				  automatic = false,
+				  rounds = 16,
+				  range = 150,
+				  damage = 5,
+				  fire_interval = 0.5,
+				  liquid_travel_dist = 2,
+})
