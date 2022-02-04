@@ -337,6 +337,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:g11", {
 				     spread = 1.25,
 				     amount = 3
 				  },
+				  scope_zoom=10,
 				  automatic = false,
 				  rounds = 16,
 				  range = 150,
