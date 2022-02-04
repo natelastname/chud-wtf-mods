@@ -58,8 +58,10 @@ end
 local start_time = os.time()
 
 factions.update_online_facts = function()
-   return
-
+   if true then
+      return
+   end
+   
    local online_facts = factions.get_online_factions()
    local time_now = os.time()
    local diff_time = os.difftime(time_now, start_time)
