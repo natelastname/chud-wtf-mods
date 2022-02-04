@@ -44,7 +44,7 @@ function ExplosiveProjectile:on_step(dtime, moveresult)
 	 end
 	 self.object:remove()
 	 -- Don't pass the name of the owner because we want
-	 -- players to be able to grief eachother using this.
+	 -- players to be able to grief each other using this.
 	 
 	 --[[
 	 bombutil.boom(p, "", {
@@ -58,10 +58,12 @@ function ExplosiveProjectile:on_step(dtime, moveresult)
 	 })
 	 ]]--
 
+	 -- A better explosions mod
 	 explosions.explode(p, {
 			       strength=self.def.blast_strength,
 			       radius=self.def.blast_radius
 	 })
+	 -- only spawns particles and makes a sound
 	 bombutil.boom(p, "", {
 			  radius=self.def.blast_radius
 	 })

@@ -10,6 +10,7 @@ periodic_msgs.msgs = {
    "If you forget your faction's password, the faction owner can retrieve it using /f info",
    "All doors placed in faction claimed territory are automatically protected.",
    "All forms of chest protection have been disabled.",
+   "This server has anticheat",
    "There is a 50% chance a random item modifier will be applied to any crafted tools."
 }
 periodic_msgs.counter = 0

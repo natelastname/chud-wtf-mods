@@ -1,3 +1,0 @@
-default
-drug_wars
-cursed_world?
