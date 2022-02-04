@@ -8,7 +8,7 @@ factions = {}
 -- This variable "version" can be used by other mods to check the compatibility of this mod
 factions.version = 2
 
-local facts = {}
+facts = {}
 local storage = minetest.get_mod_storage()
 
 -- Factions are stored in plain text rather than a database. The whole thing
@@ -19,6 +19,15 @@ if storage:get_string("facts") ~= "" then
    facts = minetest.deserialize(storage:get_string("facts"))
 end
 -- Here, we could do some basic checks to make sure there are no invalid factions
+-- (e.g., factions with no members)
+
+-- Make sure there are no factions with no value for last_online 
+for fname, fact in pairs(facts) do
+   if fact.last_online == nil then
+      facts[fname].last_online = 0
+   end
+end
+
 
 
 factions.mode_unique_faction = minetest.settings:get_bool("player_factions.mode_unique_faction", true)
@@ -233,7 +242,7 @@ function factions.tp_f_home(player_name)
       minetest.chat_send_player(player_name, "Your faction does not have a home position. Set one using '/f sethome' first.")
       return
    end
-   player:set_pos(f_home)
+   tp_manage.teleport_player(player_name, f_home)
    minetest.chat_send_player(player_name, "Teleported to faction home.")
 end
 
@@ -537,29 +546,19 @@ local function handle_command(name, param)
    elseif action == "showclaim" then
       simple_protection.show(name)
    elseif action == "claimlist" then
-      -- fixed hopefully 
       simple_protection.list(name)
    elseif action == "radar" then
-      -- No idea if this will work
       simple_protection.radar(name)
    elseif action == "claim" then
-      -- This should now work
       simple_protection.claim(name)
    elseif action == "unclaim" then
-      -- This should now work
       simple_protection.unclaim(name)
    elseif action == "unclaimall" then
       simple_protection.delete_all_claims(name)
    elseif action == "sethome" then
       factions.set_f_home(name)
    elseif action == "home" then
-      
-      if tp_manage.can_teleport(name) == false then
-	 return
-      end
-      
       factions.tp_f_home(name)
-      
    else
       minetest.chat_send_player(name, S("Unknown subcommand. Run '/help f' for help."))
    end
@@ -593,3 +592,5 @@ minetest.register_chatcommand("f", {
 				 privs = {},
 				 func = handle_command
 })
+
+dofile(minetest.get_modpath("playerfactions").."/offline_raiding.lua")

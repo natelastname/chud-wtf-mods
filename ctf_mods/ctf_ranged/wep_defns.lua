@@ -126,7 +126,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:glock17", {
 				  type = "pistol",
 				  description = "Glock 17",
 				  texture = "rangedweapons_glock17.png",
-				  fire_sound = "ctf_ranged_glock",
+				  fire_sound = "ctf_ranged_mp5fire",
 				  rounds = 17,
 				  range = 75,
 				  damage = 3,
@@ -328,25 +328,6 @@ ctf_ranged.simple_register_gun("ctf_ranged:python", {
 				  liquid_travel_dist = 2,
 })
 
-
-
-ctf_ranged.simple_register_gun("ctf_ranged:deagle_gold", {
-				  type = "smg",
-				  description = "Gold Deagle",
-				  texture = "rangedweapons_golden_deagle.png",
-				  fire_sound = "ctf_ranged_deagle",
-				  bullet = {
-				     spread = 1.25,
-				     amount = 3
-				  },
-				  automatic = false,
-				  rounds = 16,
-				  range = 150,
-				  damage = 10,
-				  fire_interval = 0.5,
-				  liquid_travel_dist = 2,
-})
-
 ctf_ranged.simple_register_gun("ctf_ranged:g11", {
 				  type = "smg",
 				  description = "HK G11",
@@ -362,4 +343,69 @@ ctf_ranged.simple_register_gun("ctf_ranged:g11", {
 				  damage = 5,
 				  fire_interval = 0.5,
 				  liquid_travel_dist = 2,
+})
+
+ctf_ranged.simple_register_gun("ctf_ranged:deagle_gold", {
+				  type = "pistol",
+				  description = "IMI Desert Eagle",
+				  texture = "rangedweapons_golden_deagle.png",
+				  fire_sound = "ctf_ranged_deagle",
+				  rounds = 8,
+				  range = 75,
+				  damage = 5,
+				  automatic = false,
+				  fire_interval = 0.5,
+				  liquid_travel_dist = 2
+})
+
+
+
+
+function LaunchExplosiveProjectile(def)
+   local staticdata = minetest.serialize(def)
+   minetest.add_entity(def.pos, "covid19:ExplosiveProjectile", staticdata)
+end
+
+
+local function launch_bomb(user, def)
+   local pos = user:get_pos()
+   local dir = user:get_look_dir()
+   if pos == nil or dir == nil then  
+      return
+   end
+   
+   local eye_offset = {x=0, y=1.625, z=0}
+   local p = vector.new(eye_offset.x + pos.x + dir.x,
+			eye_offset.y + pos.y + dir.y,
+			eye_offset.z + pos.z + dir.z)
+
+   local speed = 20
+   local vel = {x = dir.x*speed, y=dir.y*speed, z = dir.z*speed}
+   local owner_name = user:get_player_name()
+   if owner_name == nil then
+      return
+   end
+   local staticdata = LaunchExplosiveProjectile({
+	 pos=p,
+	 vel=vel,
+	 owner_name=owner_name,
+	 blast_strength=200,
+	 blast_radius=3
+   })
+end
+
+
+ctf_ranged.simple_register_gun("ctf_ranged:m79", {
+				  type = "pistol",
+				  description = "M79",
+				  texture = "rangedweapons_m79.png",
+				  fire_sound = "ctf_ranged_ashotfir",
+				  ammo="ctf_ranged:40mm",
+				  rounds = 2,
+				  range = 50,
+				  damage = 3,
+				  automatic = false,
+				  fire_interval = 1.5,
+				  liquid_travel_dist = 2,
+				  on_fire_callback=launch_bomb
 })

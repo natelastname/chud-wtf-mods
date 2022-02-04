@@ -69,7 +69,7 @@ local function print_blast_resistances()
 		 end
    end)
    for i, v in pairs(items) do
-      print(v.name .."," ..tostring(v.br))
+      --print(v.name .."," ..tostring(v.br))
    end
    
 end

@@ -9,7 +9,8 @@ mobs_mc.override.spawn_height = {
 
 mobs_mc.override.items = {
    arrow = "ctf_ranged:ammo",
-   bow="ctf_ranged:makarov"
+   bow="ctf_ranged:makarov",
+   music_discs = {"ctf_ranged:deagle_gold"}
 }
 
 print("mobs_mc_gameconfig:")

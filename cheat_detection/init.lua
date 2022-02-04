@@ -968,10 +968,11 @@ minetest.register_on_cheat(function(player, cheat)
 	 send_alert_to_serverstaff(name, accusation)
 	 return
       end
+      -- This can be triggered too easily, appears to be broken
       if cheat.type == "dug_unbreakable" then
-	 info.anticheat_callout_time = info.anticheat_callout_time + 1 
-	 accusation = "instantbreak"
-	 send_alert_to_serverstaff(name, accusation)
+	 accusation = "instantbreak" 
+	 --info.anticheat_callout_time = info.anticheat_callout_time + 1 
+	 --send_alert_to_serverstaff(name, accusation)
 	 return
       end
       if cheat.type == "dug_too_fast" then

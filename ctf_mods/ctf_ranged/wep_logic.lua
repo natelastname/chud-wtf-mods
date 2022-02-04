@@ -1,11 +1,6 @@
-ctf_ranged = {}
 
 local shoot_cooldown = ctf_core.init_cooldowns()
 
-minetest.register_craftitem("ctf_ranged:ammo", {
-			       description = "Ammo",
-			       inventory_image = "ctf_ranged_ammo.png",
-})
 
 local function process_ray(ray, user, look_dir, def)
    local hitpoint = ray:hit_object_or_node({
@@ -107,7 +102,6 @@ local function cartridge_particles(player)
 	 glow = 15,
    })
 end
-      
 
 function ctf_ranged.simple_register_gun(name, def)
    minetest.register_tool(rawf.also_register_loaded_tool(name, {
@@ -123,7 +117,7 @@ function ctf_ranged.simple_register_gun(name, def)
 								  minetest.sound_play("ctf_ranged_click", {pos = user:get_pos()}, true)
 								  return
 							       end
-							       
+
 							       local result = rawf.load_weapon(itemstack, user:get_inventory())
 
 							       if result:get_name() == itemstack:get_name() then
@@ -161,16 +155,25 @@ function ctf_ranged.simple_register_gun(name, def)
 								  shoot_cooldown:set(user, def.fire_interval)
 							       end
 
+							       if def.on_fire_callback then
+								  def.on_fire_callback(user, def)
+								  minetest.sound_play(def.fire_sound, {pos = user:get_pos()}, true)
+								  if def.rounds > 0 then
+								     return rawf.unload_weapon(itemstack)
+								  end
+								  return
+							       end
+							       
 							       local spawnpos, look_dir = rawf.get_bullet_start_data(user)
 							       local endpos = vector.add(spawnpos, vector.multiply(look_dir, def.range))
 							       local rays
-
+							       
 							       if type(def.bullet) == "table" then
 								  def.bullet.texture = "ctf_ranged_bullet.png"
 							       else
 								  def.bullet = {texture = "ctf_ranged_bullet.png"}
 							       end
-
+							       
 							       if not def.bullet.spread then
 								  rays = {rawf.bulletcast(
 									     def.bullet,
@@ -179,18 +182,17 @@ function ctf_ranged.simple_register_gun(name, def)
 							       else
 								  rays = rawf.spread_bulletcast(def.bullet, spawnpos, endpos, true, true)
 							       end
-
+							       
 							       minetest.sound_play(def.fire_sound, {pos = user:get_pos()}, true)
-
+							       
 							       for _, ray in pairs(rays) do
 								  process_ray(ray, user, look_dir, def)
 							       end
-
+							       
 							       if def.rounds > 0 then
 								  return rawf.unload_weapon(itemstack)
 							       end
 							    end
-
 							    if def.rightclick_func then
 							       loaded_def.on_place = function(itemstack, user, pointed, ...)
 								  local pointed_def = false
