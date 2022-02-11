@@ -15,15 +15,18 @@
 --   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 --TODO: Test further to find additional false positives
-
+cheat_detection = {}
 local enable_automod = minetest.settings:get('enable_cheat_detection_automod') or false
 local automod_type = minetest.settings:get('cheat_detection_automod_type') or "ban"
 local automod_reason = minetest.settings:get('cheat_detection_automod_reason') or "Excessive Cheating Attempts"
-local cheat_detection_step = tonumber(minetest.settings:get("cheat_detection_step")) or 0
-local server_step = tonumber(minetest.settings:get("dedicated_server_step")) or 0.1
+-- The minimum amount of seconds between cheat detection checks on any individual player.
+-- This mod also takes into account the player's latency. 
+local cheat_detection_step = tonumber(minetest.settings:get("cheat_detection_step")) or 1/30
+-- How long to grant immunity when a player logs in, respawns, teleports, etc.
+local immunity_period_secs = 2.0
+-- unused
+local server_step = tonumber(minetest.settings:get("dedicated_server_step")) or 1/60
 local patience_meter = 5
-local cheat_patience_meter = 3
-local node_under_height = 0.7
 local server_host = minetest.settings:get("name") or ""
 local detection_list = {}
 local debug_hud_list = {}
@@ -92,19 +95,15 @@ end
 local function add_tracker(player)
    local name = player:get_player_name()
    if not detection_list[name] then
-      -- A lot of this crap is un
+      -- A lot of this crap is unused, or otherwise should be deleted.
       detection_list[name] = {
 	 suspicion = "None",
 	 prev_pos = {x = 0, y = 0, z = 0},
 	 prev_velocity = {x = 0, y = 0, z = 0},
 	 strikes = 0,
 	 patience_cooldown = 2,
-	 logged_in = true,
-	 logged_in_cooldown = 4,
-	 li_cd_full_time = 0,
 	 automod_triggers = 0,
 	 instant_punch_time = 0,
-	 anticheat_callout_time = 0,
 	 unhold_sneak_time = 0,
 	 liquid_walk_time = 0,        
 	 flight_time = 0,
@@ -112,7 +111,6 @@ local function add_tracker(player)
 	 node_clipping_time = 0, 
 	 flying = false,
 	 alert_sent = false,
-	 punched = false,
 	 falling = false,
 	 killaura = false,
 	 fast_dig = false,
@@ -401,54 +399,8 @@ local function send_alert_to_serverstaff(suspect, suspicion)
    end
 end
 
-local function floatToInt(v, d)
-
-   local x
-   local y
-   local z
+local function check_if_forced_flying(player, info, pos, velocity, avg_rtt)
    
-   if v.x > 0 then
-      x = d/2
-   else
-      x = d/-2
-   end
-
-   if v.y > 0 then
-      y = d/2
-   else
-      y = d/-2
-   end
-   
-   if v.z > 0 then
-      z = d/2
-   else
-      z = d/-2
-   end
-   
-   local ret = vector.new({
-	 x = (v.x + x) / d,
-	 y = (v.y + y) / d,
-	 z = (v.z + z) / d
-   })
-
-   ret = vector.round(ret)
-
-   print(vector.to_string(ret))
-   
-   return vector.round(ret)
-   
-
-end
-
-
-local function check_if_forced_flying(player, info, pos, velocity, avg_rtt)      
-   
-   --Skip flight check if punched or logged in
-   if info.logged_in == true or info.punched == true then
-      info.hover_time = 0
-      return false
-   end
-
    if velocity.y ~= 0 then
       info.hover_time = 0
       return false
@@ -494,7 +446,9 @@ local function check_if_forced_flying(player, info, pos, velocity, avg_rtt)
    local near_nodes = check_surrounding_for_nodes(1, pos)
    
    if near_nodes == true then
-      minetest.log("action", "[CHEAT DETECTION]: Hover check of player "..name.." failed, they are near some solid node.")
+      if debug_mode then
+	 minetest.log("action", "[CHEAT DETECTION]: Hover check of player "..name.." failed, they are near some solid node.")
+      end
       info.hover_time = 0
       return false
    end
@@ -503,7 +457,9 @@ local function check_if_forced_flying(player, info, pos, velocity, avg_rtt)
 
    if near_ent == true then
       -- They are near something solid.
-      minetest.log("action", "[CHEAT DETECTION]: Hover check of player "..name.." failed, they are near some solid entity.")
+      if debug_mode then
+	 minetest.log("action", "[CHEAT DETECTION]: Hover check of player "..name.." failed, they are near some solid entity.")
+      end
       info.hover_time = 0
       return false
    end
@@ -545,12 +501,9 @@ local function check_if_forced_flying(player, info, pos, velocity, avg_rtt)
       minetest.log("action", "[CHEAT DETECTION]: Player "..name.." was falling down but was halted by unloaded blocks, No suspicious activity found.")
       return false
    end
-
    
-
    info.hover_time = info.hover_time + 1
    local delay = tonumber(patience_meter + avg_rtt)
-
 
    if debug_mode then
       minetest.log("warning", "[CHEAT DETECTION]: Player "..name.." is detected as hovering ("..tostring(info.hover_time).."/"..tostring(delay)..")")
@@ -569,11 +522,6 @@ end
 
 local function check_if_forced_noclipping(player, info, pos, velocity, avg_rtt)
    local result = false
-
-   --Skip Noclip check if punched
-   if info.punched == true then
-      return false
-   end
    
    if pos == nil then
       return false
@@ -599,7 +547,6 @@ local function check_if_forced_noclipping(player, info, pos, velocity, avg_rtt)
 
    if info.prev_stuck_pos == nil then
       -- The player is stuck, but no previous position is stored
-      print("First")
       info.is_stuck = true
       info.prev_stuck_pos = current_pos
       return false
@@ -641,11 +588,6 @@ end
 local function check_if_forced_fast(player, info)
    local result = false
 
-   --Skip Jesus Walk check if punched
-   if info.punched == true then
-      return result
-   end
-
    local aux_pressed = player:get_player_control().aux1
 
    --if player is not pressing sprint key, skip this check
@@ -676,11 +618,6 @@ end
 
 local function check_if_jesus_walking(player, info, pos, velocity, avg_rtt)
    local result = false
-
-   --Skip Jesus Walk check if punched
-   if info.punched == true then
-      return result
-   end
 
    local name = player:get_player_name()
    local obstacle_under = get_obstacle_found_under(player, 1)
@@ -734,8 +671,7 @@ end
 
 
 -- player, info, pos, velocity, pinfo.avg_rtt
-local function on_after_rtt(pname)
-   
+local function on_after_rtt(pname)   
    local player = minetest.get_player_by_name(pname)
    
    if player == nil then
@@ -846,19 +782,18 @@ local function on_after_rtt(pname)
 
    end
 
-   info.punched = false
    info.prev_velocity = velocity
    info.prev_pos = pos
    update_tracker_info(player, info)
 
 end
 
-
-
 -- This is a neccessary wrapper to handle errors resulting from players logging off.
 -- Otherwise, some random player:get_pos() call could fail within handle_cheat_detection
 -- when a player leaves the game and cause the whole server to crash.
-local function schedule_cheat_detect(time, func, pname)
+-- It is also not a big deal if this fails in production, because it will automatically
+-- be called again. 
+local function run_cheat_detect(time, func, pname)
    minetest.after(time, function(pname)
 		     local status, err = pcall(func, pname)
 		     if status == false then
@@ -868,58 +803,54 @@ local function schedule_cheat_detect(time, func, pname)
    end, pname)
 end
 
+local cheat_detect_cooldown = ctf_core.init_cooldowns()
+local immunity_cooldown = ctf_core.init_cooldowns()
+
+function cheat_detection.grant_temp_immunity(player)
+   local pname = player:get_player_name()
+   if pname ~= nil then
+      minetest.log("action", "[CHEAT DETECTION] Player " .. pname .. " granted temporary immunity.")
+   end
+   immunity_cooldown:set(player, immunity_period_secs)
+end
+
+
 --Enable Server Anti-Cheat System if Player Manager is Present, keep an eye out for suspicious activity
 local function handle_cheat_detection()
    local players = minetest.get_connected_players()
-
-   for _,player in pairs(players) do
+   for _, player in pairs(players) do
+      
       local pname = player:get_player_name()
       local is_superuser = minetest.check_player_privs(pname, {server=true})
-      local pinfo = minetest.get_player_information(pname) --this is important
+      local pinfo = minetest.get_player_information(pname)
       local info = get_tracker(player)
       local smite = false
-
       local skip_player = false
-
+      
       if pname == server_host or is_superuser then
 	 skip_player = true
       end
+      
       if debug_mode then
 	 skip_player = false
       end
+
+      if immunity_cooldown:get(player) then
+	 -- The player has temporary immunity (after login, after teleporting, when they respawn)
+	 skip_player = true
+      end
       
+      if cheat_detect_cooldown:get(player) then
+	 -- There is no need to cheat detect a player more than once
+	 -- in one avg_rtt interval.
+	 skip_player = true
+      end
       
       if pinfo and info and skip_player == false then
-
-	 --If detection step is too fast, slow down the cooldown timer so some detection algorithms are less aggressive when a player reconnects to the server after jumping
-	 if info.logged_in == true and info.logged_in_cooldown > 0 and cheat_detection_step < 0.3 and server_step <= 0.1 then
-	    info.li_cd_full_time = info.li_cd_full_time + 1
-
-	    if info.li_cd_full_time > 15 then
-	       info.logged_in_cooldown = info.logged_in_cooldown - 1
-	       info.li_cd_full_time = 0
-	    end
-
-	    if info.logged_in_cooldown < 1 then
-	       info.logged_in = false
-	       info.logged_in_cooldown = nil
-	    end
-	    
-	  --If detection step is at a balanced rate, then normally count down without any further delay
-	 elseif info.logged_in == true and info.logged_in_cooldown > 0 and (cheat_detection_step >= 0.3 or server_step >= 0.1) then
-	    info.logged_in_cooldown = info.logged_in_cooldown - 1
-
-	    if info.logged_in_cooldown < 1 then
-	       info.logged_in = false
-	       info.logged_in_cooldown = nil
-	    end
-	 end
-
-	 --Scan players every single average round trip time for accuracy
-	 schedule_cheat_detect(pinfo.avg_rtt, on_after_rtt, pname)
-
+	 cheat_detect_cooldown:set(player, pinfo.avg_rtt)
+	 run_cheat_detect(pinfo.avg_rtt, on_after_rtt, pname)
       end
-
+      
    end
    minetest.after(cheat_detection_step, handle_cheat_detection)
 end
@@ -931,25 +862,19 @@ end)
 
 minetest.register_on_leaveplayer(function(player)
       remove_tracker(player)
-      --update_debug_hud(player, true)
 end)
-
 
 minetest.register_on_joinplayer(function(player)
-      --Add the dang tracker onto the specified player
       add_tracker(player)
+      cheat_detection.grant_temp_immunity(player)
 end)
-
 
 -- Handle the built-in Minetest cheat detection
 minetest.register_on_cheat(function(player, cheat)
       local info = get_tracker(player)
 
       --Skip shenanigain check if player is punched, this is for knockback exceptions
-      if info.punched == true or info.killaura_check == true then
-	 return
-      end 
-
+      
       local name = player:get_player_name()
       local pinfo = minetest.get_player_information(name)
       local accusation = nil
@@ -963,7 +888,6 @@ minetest.register_on_cheat(function(player, cheat)
       end
 
       if cheat.type == "interacted_too_far" then
-	 info.anticheat_callout_time = info.anticheat_callout_time + 1
 	 accusation = "unlimitedrange"
 	 send_alert_to_serverstaff(name, accusation)
 	 return
@@ -971,27 +895,17 @@ minetest.register_on_cheat(function(player, cheat)
       -- This can be triggered too easily, appears to be broken
       if cheat.type == "dug_unbreakable" then
 	 accusation = "instantbreak" 
-	 --info.anticheat_callout_time = info.anticheat_callout_time + 1 
 	 --send_alert_to_serverstaff(name, accusation)
 	 return
       end
       if cheat.type == "dug_too_fast" then
-	 info.anticheat_callout_time = info.anticheat_callout_time + 1
 	 accusation = "fastdig"
 	 send_alert_to_serverstaff(name, accusation)
 	 return
       end
 end)
 
-function detect_killaura(player, hitter, punchtime)
-   if minetest.is_player(player) then
-      local info = get_tracker(player)
-      --Knockback Exceptions
-      if info then
-	 info.punched = true
-      end
-   end
-   
+function detect_killaura(player, hitter, punchtime)   
    local name = nil
    local info2 = nil
    local pinfo = nil
@@ -1004,7 +918,7 @@ function detect_killaura(player, hitter, punchtime)
       delay = tonumber(patience_meter + pinfo.avg_rtt - 1)
    end
 
-   --killaura detection, there is absolutely no flipping way any normal human being can land a 0 second punch repeatedly (No Mercy for these scrubs)
+   --killaura detection (Needs to be redesigned?)
    if info2 and punchtime <= 0 then
       info2.killaura_check = true
       info2.instant_punch_time = info2.instant_punch_time + 1
