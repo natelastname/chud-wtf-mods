@@ -510,7 +510,7 @@ local function handle_command(name, param)
       local password = params[3]
       factions.create(name, faction_name, password)
    elseif action == "disband" then
-      factions.disband(name, password)
+      factions.disband(name)
    elseif action == "list" then
       factions.list(name)
       return true
