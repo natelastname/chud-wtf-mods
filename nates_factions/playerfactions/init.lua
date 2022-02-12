@@ -28,8 +28,6 @@ for fname, fact in pairs(facts) do
    end
 end
 
-
-
 factions.mode_unique_faction = minetest.settings:get_bool("player_factions.mode_unique_faction", true)
 factions.max_members_list = tonumber(minetest.settings:get("player_factions.max_members_list")) or 50
 
@@ -151,7 +149,8 @@ function factions.register_faction(fname, founder, pw)
       owner = founder,
       password = pw,
       members = {[founder] = true},
-      home = ""
+      home = "",
+      last_online = os.time()
    }
    save_factions()
    return true
@@ -303,7 +302,13 @@ function factions.info(name, faction_name)
 	    end
 	 end
       end
-      minetest.chat_send_player(name, S("Name: @1\nOwner: @2\nMembers: @3", faction_name, factions.get_owner(faction_name), fmembers))
+      local msg = ""
+      msg = msg .. "Name: " .. faction_name .. "\n"
+      msg = msg .. "Owner: " .. factions.get_owner(faction_name) .. "\n"
+      msg = msg .. "Currently raidable: " .. tostring(factions.is_faction_raidable(faction_name)) .. "\n"
+      msg = msg .. "Members: " .. fmembers .. "\n"
+      
+      minetest.chat_send_player(name, msg)
       if factions.get_owner(faction_name) == name or minetest.get_player_privs(name).playerfactions_admin then
 	 minetest.chat_send_player(name, S("Password: @1", factions.get_password(faction_name)))
       end
