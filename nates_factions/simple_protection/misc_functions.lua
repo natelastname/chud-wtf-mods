@@ -54,7 +54,6 @@ sp.can_access = function(pos, player_name)
    -- that owns the territory is raidable.
    if player_name == "" then
       local raidable = factions.is_faction_raidable(data.owner)
-      print(tostring(data.owner).. ": ".. tostring(raidable))
       return raidable
    end
 

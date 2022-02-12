@@ -117,7 +117,7 @@ factions.update_online_facts = function()
    local online_facts = factions.get_online_factions()
    local time_now = os.time()
    local diff_time = os.difftime(time_now, start_time)
-   minetest.log("action", "[playerfactions] Updating online factions list...")
+   --minetest.log("action", "[playerfactions] Updating online factions list...")
 
    -- 1. Update last_online for all online factions.
    -- 2. Detect if an online faction became raidable due to a player being online.  
