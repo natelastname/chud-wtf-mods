@@ -157,10 +157,13 @@ function ctf_ranged.simple_register_gun(name, def)
 							       -- Could be worth benchmarking the performance effects.
 							       --cartridge_particles(user)
 							       if def.automatic then
+
+								  -- If automatic, let Rawf handle the automatic fire interval
 								  if not rawf.enable_automatic(def.fire_interval, itemstack, user) then
 								     return
 								  end
 							       else
+								  -- If not automatic, we handle the fire interval.
 								  shoot_cooldown:set(user, def.fire_interval)
 							       end
 
