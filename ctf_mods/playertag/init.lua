@@ -91,6 +91,7 @@ minetest.register_entity("playertag:tag", {
 })
 
 minetest.register_on_joinplayer(function(player)
+      -- Sometimes this doesn't work correctly on startup? May only be an issue in singleplayer.
       players[player:get_player_name()] = {type = TYPE_BUILTIN, color = {a=255, r=255, g=255, b=255}}
       playertag.set(player, playertag.TYPE_ENTITY)		
 end)
