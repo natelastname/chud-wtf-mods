@@ -16,8 +16,8 @@ sp.can_access = function(pos, player_name)
    if not player_name then
       return false
    end
-   -- Allow access for pipeworks and unidentified mods
-   if player_name == ":pipeworks" or player_name == "" then
+   -- Allow access for pipeworks (Unused)
+   if player_name == ":pipeworks" then
       return true
    end
 
@@ -29,7 +29,7 @@ sp.can_access = function(pos, player_name)
 
    -- Data of current area
    local data = sp.get_claim(pos)
-
+   
    -- Area is not claimed
    if not data then
       -- Allow digging when claiming is not forced
@@ -48,20 +48,34 @@ sp.can_access = function(pos, player_name)
       return true
    end
 
-   -- A simple modification to give factions access to eachother's territory.
-   -- Doesn't support the case where factions.mode_unique_faction=false.
-   -- MAJOR PROBLEM: If a player leaves a faction, they take all their territory with them
-   -- This can be fixed.
-   if factions.get_player_faction(player_name) == data.owner then
-      return true
+   -- Factions related stuff
+
+   -- Only allow access when player_name is empty if the faction
+   -- that owns the territory is raidable.
+   if player_name == "" then
+      local raidable = factions.is_faction_raidable(data.owner)
+      print(tostring(data.owner).. ": ".. tostring(raidable))
+      return raidable
    end
 
-   -- Here is where we could add a check to see if members of both faction are online.
-   -- We could also do things like check the relative power of each faction.
+   
 
    
-   return false
+
+   -- Note that explosives and raiding tools do not pass the player name
+   -- when they destroy blocks. The player name is only passed when a node
+   -- is manually destroyed or something.
+
+   local fname = factions.get_player_faction(player_name)
    
+   if fname == data.owner then
+      return true
+   end
+   
+   -- Here is where we could add a check to see if members of both faction are online.
+   -- We could also do things like check the relative power of each faction. 
+   
+   return false
 end
 
 sp.register_on_access = function(func)
