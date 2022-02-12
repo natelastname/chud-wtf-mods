@@ -26,7 +26,7 @@ tp_manage.teleport_player = function(name, dest_pos)
       return false
    end
    
-   if not tp_manage.can_teleport(name) then
+   if tp_manage.can_teleport(name) == false then
       return false
    end
 
@@ -37,7 +37,9 @@ tp_manage.teleport_player = function(name, dest_pos)
    -- - Add a cooldown
    -- - Add a period of time that the player has to stay still
    
+   cheat_detection.grant_temp_immunity(minetest.get_player_by_name(name))
    player:set_pos(dest_pos)
+   return true
 end
 
 
