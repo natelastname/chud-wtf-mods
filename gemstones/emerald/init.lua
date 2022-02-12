@@ -213,44 +213,44 @@ minetest.register_craft({
 -----------------------
 
 if minetest.get_modpath("3d_armor") then
-	armor:register_armor("emerald:helmet_emerald", {
-		description = ("Emerald Helmet"),
-		inventory_image = "emerald_helmet_inv.png",
-		groups = {armor_head=1, armor_heal=16, armor_use=70},
-		armor_groups = {fleshy=10},
-		damage_groups = {cracky=2, snappy=1, level=6},
-    })
+   armor:register_armor("emerald:helmet_emerald", {
+			   description = ("Emerald Helmet"),
+			   inventory_image = "emerald_helmet_inv.png",
+			   groups = gsconf.emerald_armor.groups_helmet,
+			   armor_groups = gsconf.emerald_armor.armor_groups_helmet,
+			   damage_groups = gsconf.emerald_armor.dmg_groups_helmet,
+   })
 
-	armor:register_armor("emerald:leggings_emerald", {
-		description = ("Emerald Leggings"),
-		inventory_image = "emerald_leggings_inv.png",
-		groups = {armor_legs=1, armor_heal=16, armor_use=70},
-		armor_groups = {fleshy=30},
-		damage_groups = {cracky=2, snappy=1, level=6},
-	})
+   armor:register_armor("emerald:leggings_emerald", {
+			   description = ("Emerald Leggings"),
+			   inventory_image = "emerald_leggings_inv.png",
+			   groups = gsconf.emerald_armor.groups_leggings,
+			   armor_groups = gsconf.emerald_armor.armor_groups_leggings,
+			   damage_groups = gsconf.emerald_armor.dmg_groups_leggings
+   })
 
-	armor:register_armor("emerald:chestplate_emerald", {
-		description = ("Emerald Chestplate"),
-		inventory_image = "emerald_chestplate_inv.png",
-		groups = {armor_torso=1, armor_heal=16, armor_use=70},
-		armor_groups = {fleshy=30},
-		damage_groups = {cracky=2, snappy=1, level=6},
-	})
+   armor:register_armor("emerald:chestplate_emerald", {
+			   description = ("Emerald Chestplate"),
+			   inventory_image = "emerald_chestplate_inv.png",
+			   groups = gsconf.emerald_armor.groups_chest,
+			   armor_groups = gsconf.emerald_armor.armor_groups_chest,
+			   damage_groups = gsconf.emerald_armor.dmg_groups_chest
+   })
 
-		armor:register_armor("emerald:boots_emerald", {
-		description = ("Emerald Boots"),
-		inventory_image = "emerald_boots_inv.png",
-		groups = {armor_feet=1, armor_heal=16, armor_use=70, physics_speed=1, physics_jump=1},
-		armor_groups = {fleshy=10},
-		damage_groups = {cracky=2, snappy=1, level=6},
-	})
+   armor:register_armor("emerald:boots_emerald", {
+			   description = ("Emerald Boots"),
+			   inventory_image = "emerald_boots_inv.png",
+			   groups = gsconf.emerald_armor.groups_boots,
+			   armor_groups = gsconf.emerald_armor.armor_groups_boots,
+			   damage_groups = gsconf.emerald_armor.dmg_groups_boots
+   })
 
-		armor:register_armor("emerald:shield_emerald", {
-			description = ("Emerald Shield"),
-			inventory_image = "emerald_shield_inv.png",
-			groups = {armor_shield=1, armor_heal=12, armor_use=70},
-			armor_groups = {fleshy=10},
-			damage_groups = {cracky=2, snappy=1, level=6},
-	})
+   armor:register_armor("emerald:shield_emerald", {
+			   description = ("Emerald Shield"),
+			   inventory_image = "emerald_shield_inv.png",
+			   groups = {armor_shield=1, armor_heal=12, armor_use=70},
+			   armor_groups = gsconf.emerald_armor.armor_groups_shield,
+			   damage_groups = gsconf.emerald_armor.dmg_groups_shield
+   })
 
 end
