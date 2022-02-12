@@ -52,7 +52,7 @@ if enable_automod and type(enable_automod) == "string" then
    end
 end
 
-
+-- I don't understand the point of this function
 local function get_velocity_as_whole_interger(player, dir)
    local result = nil
    local velocity = player:get_velocity()
@@ -793,20 +793,22 @@ end
 -- when a player leaves the game and cause the whole server to crash.
 -- It is also not a big deal if this fails in production, because it will automatically
 -- be called again. 
-local function run_cheat_detect(time, func, pname)
-   minetest.after(time, function(pname)
-		     local status, err = pcall(func, pname)
-		     if status == false then
-			minetest.log("warning", "[CHEAT DETECTION] Error, hopefully this was caused by a player leaving the game:")
+local function run_cheat_detect(func, pname)
+   local status, err = pcall(func, pname)
+   if status == false then
+      minetest.log("warning", "[CHEAT DETECTION] Error, hopefully this was caused by a player leaving the game:")
 			minetest.log("warning", "[CHEAT DETECTION]".. err)
-		     end
-   end, pname)
+   end
 end
 
 local cheat_detect_cooldown = ctf_core.init_cooldowns()
 local immunity_cooldown = ctf_core.init_cooldowns()
 
 function cheat_detection.grant_temp_immunity(player)
+   if player == nil or not player.get_player_name then
+      return
+   end
+   
    local pname = player:get_player_name()
    if pname ~= nil then
       minetest.log("action", "[CHEAT DETECTION] Player " .. pname .. " granted temporary immunity.")
@@ -848,7 +850,7 @@ local function handle_cheat_detection()
       
       if pinfo and info and skip_player == false then
 	 cheat_detect_cooldown:set(player, pinfo.avg_rtt)
-	 run_cheat_detect(pinfo.avg_rtt, on_after_rtt, pname)
+	 run_cheat_detect(on_after_rtt, pname)
       end
       
    end
@@ -887,6 +889,7 @@ minetest.register_on_cheat(function(player, cheat)
 	 return
       end
 
+      -- Problem: this can be triggered by ranged weapons
       if cheat.type == "interacted_too_far" then
 	 accusation = "unlimitedrange"
 	 send_alert_to_serverstaff(name, accusation)
@@ -918,7 +921,7 @@ function detect_killaura(player, hitter, punchtime)
       delay = tonumber(patience_meter + pinfo.avg_rtt - 1)
    end
 
-   --killaura detection (Needs to be redesigned?)
+   --killaura detection (Needs to be redesigned)
    if info2 and punchtime <= 0 then
       info2.killaura_check = true
       info2.instant_punch_time = info2.instant_punch_time + 1
