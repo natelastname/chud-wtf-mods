@@ -30,7 +30,9 @@
 
 ]]--
 
-
+local range_shotgun = 25
+local range_normal = 150
+local range_long = 500
 --------------------------
 -- Tier 1
 --------------------------
@@ -41,8 +43,8 @@ ctf_ranged.simple_register_gun("ctf_ranged:makarov", {
 				  texture = "rangedweapons_makarov.png",
 				  fire_sound = "ctf_ranged_mp5fire",
 				  rounds = 8,
-				  range = 50,
-				  damage = 3,
+				  range = range_normal,
+				  damage = 2,
 				  automatic = false,
 				  fire_interval = 0.6,
 				  liquid_travel_dist = 2
@@ -54,7 +56,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:mini14", {
 				  texture = "ctf_ranged_mini14.png",
 				  fire_sound = "ctf_ranged_m16fire",
 				  rounds = 20,
-				  range = 150,
+				  range = range_long,
 				  damage = 4,
 				  fire_interval = 0.8,
 				  liquid_travel_dist = 4,
@@ -66,13 +68,13 @@ ctf_ranged.simple_register_gun("ctf_ranged:remington870", {
 				  texture = "rangedweapons_remington.png",
 				  fire_sound = "ctf_ranged_shotgun",
 				  bullet = {
-				     amount = 28,
-				     spread = 3.5,
+				     amount = 20,
+				     spread = 4,
 				  },
 				  rounds = 7,
-				  range = 24,
-				  damage = 1,
-				  fire_interval = 2,
+				  range = range_shotgun,
+				  damage = 2,
+				  fire_interval = 1,
 })
 
 ctf_ranged.simple_register_gun("ctf_ranged:thompson", {
@@ -85,8 +87,8 @@ ctf_ranged.simple_register_gun("ctf_ranged:thompson", {
 				  },
 				  automatic = true,
 				  rounds = 20,
-				  range = 75,
-				  damage = 1,
+				  range = range_normal,
+				  damage = 2,
 				  fire_interval = 0.1,
 				  liquid_travel_dist = 2,
 })
@@ -101,7 +103,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:ak47", {
 				  },
 				  automatic = true,
 				  rounds = 30,
-				  range = 75,
+				  range = range_normal,
 				  damage = 2,
 				  fire_interval = 0.15,
 				  liquid_travel_dist = 2,
@@ -117,9 +119,9 @@ ctf_ranged.simple_register_gun("ctf_ranged:rpk", {
 				  },
 				  automatic = true,
 				  rounds = 100,
-				  range = 150,
+				  range = range_normal,
 				  damage = 2,
-				  fire_interval = 0.15,
+				  fire_interval = 0.2,
 				  liquid_travel_dist = 2,
 })
 
@@ -133,7 +135,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:glock17", {
 				  texture = "rangedweapons_glock17.png",
 				  fire_sound = "ctf_ranged_mp5fire",
 				  rounds = 17,
-				  range = 75,
+				  range = range_normal,
 				  damage = 3,
 				  automatic = false,
 				  fire_interval = 0.35,
@@ -147,7 +149,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:svd", {
 				  fire_sound = "ctf_ranged_m16fire",
 				  rounds = 10,
 				  scope_zoom=10,
-				  range = 150,
+				  range = range_long,
 				  damage = 5,
 				  fire_interval = 0.75,
 				  liquid_travel_dist = 4,
@@ -160,13 +162,13 @@ ctf_ranged.simple_register_gun("ctf_ranged:benelli", {
 				  texture = "rangedweapons_benelli.png",
 				  fire_sound = "ctf_ranged_shotgun",
 				  bullet = {
-				     amount = 20,
-				     spread = 2.5,
+				     amount = 15,
+				     spread = 4,
 				  },
 				  rounds = 8,
-				  range = 24,
-				  damage = 2,
-				  fire_interval = 2,
+				  range = range_shotgun,
+				  damage = 3,
+				  fire_interval = 1,
 })
 
 ctf_ranged.simple_register_gun("ctf_ranged:uzi", {
@@ -175,12 +177,12 @@ ctf_ranged.simple_register_gun("ctf_ranged:uzi", {
 				  texture = "rangedweapons_uzi.png",
 				  fire_sound = "ctf_ranged_mp5fire",
 				  bullet = {
-				     spread = 2,
+				     spread = 3.5,
 				  },
 				  automatic = true,
 				  rounds = 30,
-				  range = 75,
-				  damage = 2,
+				  range = range_normal,
+				  damage = 3,
 				  fire_interval = 0.08,
 				  liquid_travel_dist = 2,
 })
@@ -195,8 +197,8 @@ ctf_ranged.simple_register_gun("ctf_ranged:m16", {
 				  },
 				  automatic = true,
 				  rounds = 30,
-				  range = 100,
-				  damage = 2,
+				  range = range_normal,
+				  damage = 3,
 				  fire_interval = 0.15,
 				  liquid_travel_dist = 2,
 })
@@ -207,12 +209,12 @@ ctf_ranged.simple_register_gun("ctf_ranged:m60", {
 				  texture = "rangedweapons_m60.png",
 				  fire_sound = "ctf_ranged_m60fire",
 				  bullet = {
-				     spread = 1.3,
+				     spread = 2.0,
 				  },
 				  automatic = true,
 				  rounds = 150,
-				  range = 150,
-				  damage = 2,
+				  range = range_normal,
+				  damage = 3,
 				  fire_interval = 0.15,
 				  liquid_travel_dist = 2,
 })
@@ -227,10 +229,10 @@ ctf_ranged.simple_register_gun("ctf_ranged:deagle", {
 				  texture = "rangedweapons_deagle.png",
 				  fire_sound = "ctf_ranged_deagle",
 				  rounds = 8,
-				  range = 75,
+				  range = range_normal,
 				  damage = 5,
 				  automatic = false,
-				  fire_interval = 0.5,
+				  fire_interval = 0.4,
 				  liquid_travel_dist = 2
 })
 
@@ -241,8 +243,8 @@ ctf_ranged.simple_register_gun("ctf_ranged:m200", {
 				  fire_sound = "ctf_ranged_m16fire",
 				  rounds = 5,
 				  scope_zoom=10,
-				  range = 200,
-				  damage = 15,
+				  range = range_long,
+				  damage = 12,
 				  fire_interval = 2.0,
 				  liquid_travel_dist = 4,
 })
@@ -253,13 +255,13 @@ ctf_ranged.simple_register_gun("ctf_ranged:jackhammer", {
 				  texture = "rangedweapons_jackhammer.png",
 				  fire_sound = "ctf_ranged_shotgun",
 				  bullet = {
-				     amount = 20,
-				     spread = 2.5,
+				     amount = 15,
+				     spread = 4,
 				  },
 				  automatic = true,
 				  rounds = 10,
-				  range = 24,
-				  damage = 2,
+				  range = range_shotgun,
+				  damage = 3,
 				  fire_interval = 0.5,
 })
 
@@ -269,12 +271,12 @@ ctf_ranged.simple_register_gun("ctf_ranged:mp5", {
 				  texture = "rangedweapons_mp5.png",
 				  fire_sound = "ctf_ranged_mp5fire",
 				  bullet = {
-				     spread = 2,
+				     spread = 3.5,
 				  },
 				  automatic = true,
 				  rounds = 30,
-				  range = 100,
-				  damage = 3,
+				  range = range_normal,
+				  damage = 4,
 				  fire_interval = 0.08,
 				  liquid_travel_dist = 25,
 })
@@ -289,9 +291,9 @@ ctf_ranged.simple_register_gun("ctf_ranged:scar", {
 				  },
 				  automatic = true,
 				  rounds = 20,
-				  range = 150,
-				  damage = 6,
-				  fire_interval = 0.2,
+				  range = range_normal,
+				  damage = 4,
+				  fire_interval = 0.25,
 				  liquid_travel_dist = 2,
 })
 
@@ -301,12 +303,12 @@ ctf_ranged.simple_register_gun("ctf_ranged:minigun", {
 				  texture = "rangedweapons_minigun.png",
 				  fire_sound = "ctf_ranged_m60fire",
 				  bullet = {
-				     spread = 2.25,
+				     spread = 3.5,
 				  },
 				  automatic = true,
 				  rounds = 200,
-				  range = 150,
-				  damage = 4,
+				  range = range_normal,
+				  damage = 3,
 				  fire_interval = 0.08,
 				  liquid_travel_dist = 2,
 })
@@ -327,7 +329,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:python", {
 				  },
 				  automatic = false,
 				  rounds = 6,
-				  range = 100,
+				  range = range_normal,
 				  damage = 5,
 				  fire_interval = 0.8,
 				  liquid_travel_dist = 2,
@@ -345,7 +347,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:g11", {
 				  scope_zoom=10,
 				  automatic = false,
 				  rounds = 16,
-				  range = 150,
+				  range = range_normal,
 				  damage = 5,
 				  fire_interval = 0.5,
 				  liquid_travel_dist = 2,
@@ -357,10 +359,10 @@ ctf_ranged.simple_register_gun("ctf_ranged:deagle_gold", {
 				  texture = "rangedweapons_golden_deagle.png",
 				  fire_sound = "ctf_ranged_deagle",
 				  rounds = 8,
-				  range = 75,
+				  range = range_normal,
 				  damage = 5,
 				  automatic = false,
-				  fire_interval = 0.5,
+				  fire_interval = 0.4,
 				  liquid_travel_dist = 2
 })
 
@@ -396,7 +398,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:energy_pistol", {
 	texture = "rangedweapons_laser_blaster.png",
 	fire_sound = "ctf_ranged_dzap",
 	rounds = 20,
-	range = 85,
+	range = range_normal,
 	damage = 4,
 	automatic = false,
 	fire_interval = 0.35,
@@ -414,8 +416,8 @@ ctf_ranged.simple_register_gun("ctf_ranged:energy_rifle", {
 	},
 	automatic = true,
 	rounds = 30,
-	range = 75,
-	damage = 7,
+	range = range_normal,
+	damage = 4,
 	fire_interval = 0.25,
 	liquid_travel_dist = 2,
 	ammo = "ctf_ranged:eammo"
@@ -431,7 +433,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:energy_shotgun", {
 	   spread = 3.0,
 	},
 	rounds = 10,
-	range = 25,
+	range = range_shotgun,
 	damage = 2,
 	fire_interval = 0.65,
 	automatic = false,
