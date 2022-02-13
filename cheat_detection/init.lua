@@ -936,6 +936,12 @@ function detect_killaura(player, hitter, punchtime)
 
 end
 
+
+minetest.register_on_respawnplayer(function(player)
+      -- Respawning is like teleporting - it can trigger fly detection.
+      cheat_detection.grant_temp_immunity(player)
+end)
+
 minetest.register_on_punchplayer(function(player, hitter, punchtime) 
       detect_killaura(player, hitter, punchtime)
 end)
