@@ -250,6 +250,16 @@ local function check_if_entity_under(pos)
    return result
 end
 
+local function is_door(node_name)
+   if node_name == nil then
+      return false
+   end
+   if doors.registered_doors[node_name] ~= nil or doors.registered_trapdoors[node_name] ~= nil then
+      return true
+   end
+   return false
+end
+
 
 local function check_player_is_inside_nodes(player)
    local pos = player:get_pos()
@@ -259,6 +269,11 @@ local function check_player_is_inside_nodes(player)
    local result = false
 
    if node_top and node_bottom then
+
+      if is_door(node_top.name) or is_door(node_bottom.name)then
+	 return false
+      end
+
       node_top = minetest.registered_nodes[node_top.name]
       node_bottom = minetest.registered_nodes[node_bottom.name]
       if node_top and node_top.walkable and node_bottom and node_bottom.walkable then
