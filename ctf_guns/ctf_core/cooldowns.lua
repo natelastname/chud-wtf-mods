@@ -3,8 +3,8 @@ function ctf_core.init_cooldowns()
       players = {},
       set = function(self, player, time)
 
-	 if time <= 0.001 then
-	    return
+	 if time == nil or time <= 0.001 then
+	    time = 0.001
 	 end
 	 
 	 local pname = PlayerName(player)
