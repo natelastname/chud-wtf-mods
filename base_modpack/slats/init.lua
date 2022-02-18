@@ -4,6 +4,7 @@ function slats.register_slat(subname, recipeitem, groups, image, description, so
 	groups.slab = 1
 	minetest.register_node(":slats:slat_" .. subname, {
 		description = description,
+		use_texture_alpha = "clip",		  
 		drawtype = "nodebox",
 		tiles = {image},
 		inventory_image = image,

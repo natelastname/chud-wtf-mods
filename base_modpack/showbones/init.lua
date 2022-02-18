@@ -8,8 +8,8 @@ if not minetest.global_exists("showbones") then
    }
 end
 
-local share_bones_time = tonumber(minetest.setting_get("share_bones_time")) or 1200
-local share_bones_time_early = tonumber(minetest.setting_get("share_bones_time_early")) or share_bones_time / 4
+local share_bones_time = tonumber(minetest.settings:get("share_bones_time")) or 1200
+local share_bones_time_early = tonumber(minetest.settings:get("share_bones_time_early")) or share_bones_time / 4
 
 -- Loads entire showbones database
 

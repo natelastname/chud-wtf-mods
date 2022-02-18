@@ -13,6 +13,6 @@ mobs_mc.override.items = {
    music_discs = {"ctf_ranged:deagle_gold"}
 }
 
-print("mobs_mc_gameconfig:")
-print(nether.DEPTH_CEILING)
-print(nether.DEPTH_FLOOR)
+minetest.log("action", "Nether boundaries:"
+		.. " nether.DEPTH_CEILING=" .. tostring(nether.DEPTH_CEILING)
+		.. ", nether.DEPTH_FLOOR=" ..  tostring(nether.DEPTH_FLOOR))
