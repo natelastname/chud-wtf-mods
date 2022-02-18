@@ -66,7 +66,7 @@ function explosions.get_blastres(name, def)
   -- Is it possible for nodes to have a level above 3?
   local level_mul = { [0] = 1, 1.5, 2.5, 5 }
 
-  res = math.huge
+  local res = math.huge
   res = math.min(res, instant_br[minetest.get_item_group(name, 'dig_immediate')])
   res = math.min(res, oddly_br[
     minetest.get_item_group(name, 'oddly_breakable_by_hand')

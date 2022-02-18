@@ -26,7 +26,7 @@ signs_extra.path = minetest.get_modpath(signs_extra.name)
 
 -- Load support for intllib.
 --local S, NS = dofile(signs_extra.path.."/intllib.lua")
-signs_extra.intllib = S
+--signs_extra.intllib = S
 
 dofile(signs_extra.path.."/nodes.lua")
 dofile(signs_extra.path.."/crafts.lua")

@@ -11,7 +11,7 @@ lib_trm.copyright = "2019"
 lib_trm.path_mod = minetest.get_modpath(minetest.get_current_modname())
 lib_trm.path_world = minetest.get_worldpath()
 
-lib_trm.intllib = minetest.setting_get("lib_trm_engine_translation") or false
+lib_trm.intllib = minetest.settings:get_bool("lib_trm_engine_translation") or false
 
 local S
 local NS
