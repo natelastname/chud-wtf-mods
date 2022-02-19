@@ -223,7 +223,18 @@ function factions.set_f_home(player_name)
    if fname == nil then
       factions_send_player(player_name, "You are not a member of any faction. Create or join a faction first.")
       return
-   end   
+   end
+
+   local data = simple_protection.get_claim(pos)
+
+   if data == nil or fname ~= data.owner then
+      factions_send_player(player_name, "You can only set your faction's home on land that you have claimed.")
+      return
+   end
+   
+
+
+   
    facts[fname].home = pos
    save_factions()
    factions_send_player(player_name, "Faction home successfully set.")
