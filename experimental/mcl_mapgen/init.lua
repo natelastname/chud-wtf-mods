@@ -1,5 +1,5 @@
 mcl_mapgen = {}
-
+require "bit"
 local order = { -- mcl_mapgen.order...
 	DEFAULT		=    5000,
 	CHORUS		=  100000,
@@ -256,7 +256,7 @@ minetest.register_on_generated(function(minp, maxp, chunkseed)
 		local number_of_blocks = 0
 		for k, offset in pairs(ready_blocks) do
 			if queue_blocks_lvm_counter > 0 or nodes_block > 0 then
-				local block_minp = p0 + vector.multiply(offset, BS)
+			   local block_minp = vector.add(p0, vector.multiply(offset, BS))
 				local block_maxp = vector.add(block_minp, LAST_NODE_IN_BLOCK)
 				local blockseed = get_block_seed3(block_minp)
 				vm_context.minp, vm_context.maxp, vm_context.blockseed = block_minp, block_maxp, blockseed
