@@ -233,7 +233,7 @@ minetest.register_on_generated(function(minp, maxp, chunkseed)
 						local node = minetest_get_node(pos)
 						local is_generated = node.name ~= "ignore"
 						if is_generated then
-							local adjacent_chunk_pos = p0 + offset
+						   local adjacent_chunk_pos = vector.add(p0, offset)
 							if is_chunk_finished(adjacent_chunk_pos) then
 								current_chunks[#current_chunks + 1] = adjacent_chunk_pos
 							end
