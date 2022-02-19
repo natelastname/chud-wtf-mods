@@ -55,6 +55,30 @@ local function table_copy(data)
 end
 
 
+-- Return a list of players in faction fname that are currently online
+function factions.online_players_in_faction(fname)
+   local res = {}
+   if facts[fname] == nil then
+      return res
+   end
+  
+   for key, val in pairs(facts[fname].members) do
+      local name = key
+
+      if minetest.get_player_by_name(name) ~= nil then
+	 table.insert(res, name)
+      end
+   end
+   return res
+end
+
+-- Send a message to all online members of faction fname
+function factions.broadcast_to_faction(fname, msg)
+   for _, name in ipairs(factions.online_players_in_faction(fname)) do
+      minetest.chat_send_player(name, msg)
+   end
+end
+
 -- Data manipulation
 function factions.get_facts()
    return table_copy(facts)
@@ -89,7 +113,7 @@ function factions.get_player_factions(name)
    return player_factions
 end
 
-
+-- Returns faction name if player is a member of a faction, nil otherwise.
 function factions.get_player_faction(name)
    if factions.mode_unique_faction == false then
       minetest.log("warning", "Call to factions.get_player_faction with setting player_factions.mode_unique_faction=false.")
