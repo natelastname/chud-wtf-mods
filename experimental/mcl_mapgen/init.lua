@@ -1,5 +1,4 @@
 mcl_mapgen = {}
-require "bit"
 local order = { -- mcl_mapgen.order...
 	DEFAULT		=    5000,
 	CHORUS		=  100000,
