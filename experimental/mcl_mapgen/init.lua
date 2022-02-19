@@ -228,7 +228,7 @@ minetest.register_on_generated(function(minp, maxp, chunkseed)
 				for z = -CS_NODES, CS_NODES, CS_NODES do
 					if x ~= 0 or y ~= 0 or z ~= 0 then
 						local offset = vector.new(x, y, z)
-						local pos = center + offset
+						local pos = vector.add(center, offset)
 						minetest_get_voxel_manip():read_from_map(pos, pos)
 						local node = minetest_get_node(pos)
 						local is_generated = node.name ~= "ignore"
