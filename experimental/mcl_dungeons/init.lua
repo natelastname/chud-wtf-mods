@@ -139,7 +139,6 @@ end
 
 local m1, m2 = 0, 0
 local function spawn_dungeon(p1, p2, dim, pr, dontcheck)
-   print("test")
 	local x, y, z = p1.x, p1.y, p1.z
 	local check = not (dontcheck or false)
 
