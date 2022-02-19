@@ -3,6 +3,8 @@ local N = function(s) return s end
 
 local function get_tool_name(item)
 	local name = item:get_meta():get_string("name")
+	name = name:gsub("\n", ",")
+	
 	if name ~= "" then
 	  return name
 	end
@@ -190,7 +192,7 @@ minetest.register_on_dieplayer(function(player, reason)
 			
 			local hittername, hittertype, hittersubtype, shooter
 			local hitter_toolname  = get_tool_name(hitter:get_wielded_item())
-
+			
 			-- Custom message
 			if last_damages[name] then
 				msg = last_damages[name].message
