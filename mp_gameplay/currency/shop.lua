@@ -10,14 +10,10 @@ currency.shop.formspec = {
 	customer = function(pos)
 		local list_name = "nodemeta:"..pos.x..','..pos.y..','..pos.z
 		local formspec = "size[8,9.5]"..
-		"label[0,0;" .. S("Customer gives (pay here!)") .. "]"..
-		"list[current_player;customer_gives;0,0.5;3,2;]"..
-		"label[0,2.5;" .. S("Customer gets:") .. "]"..
-		"list[current_player;customer_gets;0,3;3,2;]"..
-		"label[5,0;" .. S("Owner wants:") .. "]"..
-		"list["..list_name..";owner_wants;5,0.5;3,2;]"..
-		"label[5,2.5;" .. S("Owner gives:") .. "]"..
-		"list["..list_name..";owner_gives;5,3;3,2;]"..
+		"label[0,0;" .. S("Owner wants:") .. "]"..
+		"list["..list_name..";owner_wants;0,0.5;3,2;]"..
+		"label[0,2.5;" .. S("Owner gives:") .. "]"..
+		"list["..list_name..";owner_gives;0,3;3,2;]"..
 		"list[current_player;main;0,5.5;8,4;]"..
 		"button[3,2;2,1;exchange;" .. S("Exchange") .. "]"
 		return formspec
@@ -27,8 +23,6 @@ currency.shop.formspec = {
 		local formspec = "size[8,9.5]"..
 		"label[0,0;" .. S("Customers gave:") .. "]"..
 		"list["..list_name..";customers_gave;0,0.5;3,2;]"..
-		"label[0,2.5;" .. S("Your stock:") .. "]"..
-		"list["..list_name..";stock;0,3;3,2;]"..
 		"label[4,0;" .. S("You want:") .. "]"..
 		"list["..list_name..";owner_wants;4,0.5;3,2;]"..
 		"label[4,2.5;" .. S("In exchange, you give:") .. "]"..
@@ -71,12 +65,12 @@ currency.shop.give_inventory = function(inv,list,playername)
 end
 
 currency.shop.cancel = function(meta)
-	--[[currency.shop.give_inventory(meta:get_inventory(),"pl1",meta:get_string("pl1"))
-	currency.shop.give_inventory(meta:get_inventory(),"pl2",meta:get_string("pl2"))
-	meta:set_string("pl1","")
-	meta:set_string("pl2","")
-	meta:set_int("pl1step",0)
-	meta:set_int("pl2step",0)]]
+   --[[currency.shop.give_inventory(meta:get_inventory(),"pl1",meta:get_string("pl1"))
+      currency.shop.give_inventory(meta:get_inventory(),"pl2",meta:get_string("pl2"))
+      meta:set_string("pl1","")
+      meta:set_string("pl2","")
+      meta:set_int("pl1step",0)
+      meta:set_int("pl2step",0)]]
 end
 
 currency.shop.exchange = function(meta)
@@ -129,9 +123,7 @@ minetest.register_node("currency:shop", {
 		inv:set_size("owner_wants", 3*2)
 		inv:set_size("owner_gives", 3*2)
 		if have_pipeworks then pipeworks.after_place(pos) end
-		check_stock(
-			pos
-		)
+		check_stock(pos)
 	end,
 	after_dig_node = (have_pipeworks and pipeworks and pipeworks.after_dig),
 	tube = {
@@ -139,9 +131,7 @@ minetest.register_node("currency:shop", {
 			local meta = minetest.get_meta(pos)
 			local inv = meta:get_inventory()
 			local result = inv:add_item("stock",stack)
-			check_stock(
-				pos
-			)
+			check_stock(pos)
 			return result
 		end,
 		can_insert = function(pos,node,stack,direction)
@@ -256,59 +246,69 @@ minetest.register_node("currency:shop_empty", {
 })
 
 minetest.register_on_player_receive_fields(function(sender, formname, fields)
-	if formname == "currency:shop_formspec" and fields.exchange ~= nil and fields.exchange ~= "" then
-		local name = sender:get_player_name()
-		local pos = currency.shop.current_shop[name]
-		local meta = minetest.get_meta(pos)
-		if meta:get_string("owner") == name then
-			minetest.chat_send_player(name, S("This is your own shop, you can't exchange to yourself!"))
-		else
-			local minv = meta:get_inventory()
-			local pinv = sender:get_inventory()
-			local invlist_tostring = function(invlist)
-				local out = {}
-				for i, item in pairs(invlist) do
-					out[i] = item:to_string()
-				end
-				return out
-			end
-			local wants = minv:get_list("owner_wants")
-			local gives = minv:get_list("owner_gives")
-			if wants == nil or gives == nil then return end -- do not crash the server
-			-- Check if we can exchange
-			local can_exchange = true
-			local owners_fault = false
-			for i, item in pairs(wants) do
-				if not pinv:contains_item("customer_gives",item) then
-					can_exchange = false
-				end
-			end
-			for i, item in pairs(gives) do
-				if not minv:contains_item("stock",item) then
-					can_exchange = false
-					owners_fault = true
-				end
-			end
-			if can_exchange then
-				for i, item in pairs(wants) do
-					pinv:remove_item("customer_gives",item)
-					minv:add_item("customers_gave",item)
-				end
-				for i, item in pairs(gives) do
-					--minv:remove_item("stock",item)
-					pinv:add_item("customer_gets",item)
-				end
-				minetest.chat_send_player(name, S("Exchanged!"))
-				check_stock(
-					pos
-				)
-			else
-				if owners_fault then
-					minetest.chat_send_player(name, S("Exchange can not be done, contact the shop owner."))
-				else
-					minetest.chat_send_player(name, S("Exchange can not be done, check if you put all items!"))
-				end
-			end
-		end
-	end
+      if formname == "currency:shop_formspec" and fields.exchange ~= nil and fields.exchange ~= "" then
+	 local name = sender:get_player_name()
+	 local pos = currency.shop.current_shop[name]
+	 local meta = minetest.get_meta(pos)
+	 local minv = meta:get_inventory()
+	 
+	 local pinv = sender:get_inventory() 
+
+	 local invlist_tostring = function(invlist)
+	    local out = {}
+	    for i, item in pairs(invlist) do
+	       out[i] = item:to_string()
+	    end
+	    return out
+	 end
+	 local wants = minv:get_list("owner_wants")
+	 local gives = minv:get_list("owner_gives")
+	 
+	 if wants == nil or gives == nil then
+	    -- do not crash the server
+	    return
+	 end 
+
+	 -- Check if we can exchange
+	 local can_exchange = true
+	 local owners_fault = false
+
+	 -- Check if the player has the required items
+	 for i, item in pairs(wants) do
+	    if not pinv:contains_item("main", item) then
+	       can_exchange = false
+	    end
+	 end
+
+	 if can_exchange then
+	    -- Save the player's inventory
+	    local before_exchange = pinv:get_list("main")
+	    
+	    -- Remove the items from the player's inventory
+	    -- Add them to the "customers_gave" section (not done in this fork.)
+	    for i, item in pairs(wants) do
+	       -- This should not fail, we already checked the player has the required items.
+	       local result = pinv:remove_item("main",item)
+	    end
+
+	    -- Remove the items from stock (not done in this fork.)
+	    -- Add them to the player's inventory
+	    for i, item in pairs(gives) do
+	       if pinv:room_for_item("main", item) == false then
+		  pinv:set_list("main", before_exchange)
+		  minetest.chat_send_player(name, S("Exchange could not be completed: there is not enough room in your inventory."))
+		  return
+	       end
+	       pinv:add_item("main",item)
+	    end
+	    minetest.chat_send_player(name, S("Exchanged!"))
+	    check_stock(pos)
+	 else
+	    if owners_fault then
+	       minetest.chat_send_player(name, S("Exchange can not be done, contact the shop owner."))
+	    else
+	       minetest.chat_send_player(name, S("Exchange can not be done, check if you put all items!"))
+	    end
+	 end
+      end
 end)
