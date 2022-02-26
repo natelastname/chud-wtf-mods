@@ -11,7 +11,9 @@ periodic_msgs.msgs = {
    "All doors placed in faction claimed territory are automatically protected.",
    "All forms of chest protection have been disabled.",
    "This server has anticheat",
-   "There is a 50% chance a random item modifier will be applied to any crafted tools."
+   "There is a 50% chance a random item modifier will be applied to any crafted tools.",
+   "Send emails to offline players using the command '/mail <playername> <message>'",
+   "Visit http://chud.wtf for a link to the Discord"
 }
 periodic_msgs.counter = 0
 periodic_msgs.color = "#ff9999"
