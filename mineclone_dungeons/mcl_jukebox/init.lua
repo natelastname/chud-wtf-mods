@@ -230,14 +230,14 @@ minetest.register_craft({
 	burntime = 15,
 })
 
-mcl_jukebox.register_record("The Evil Sister (Jordach's Mix)", "SoundHelix", "13", "mcl_jukebox_record_13.png", "mcl_jukebox_track_1")
-mcl_jukebox.register_record("The Energetic Rat (Jordach's Mix)", "SoundHelix", "wait", "mcl_jukebox_record_wait.png", "mcl_jukebox_track_2")
-mcl_jukebox.register_record("Eastern Feeling", "Jordach", "blocks", "mcl_jukebox_record_blocks.png", "mcl_jukebox_track_3")
-mcl_jukebox.register_record("Minetest", "Jordach", "far", "mcl_jukebox_record_far.png", "mcl_jukebox_track_4")
-mcl_jukebox.register_record("Credit Roll (Jordach's HD Mix)", "Junichi Masuda", "chirp", "mcl_jukebox_record_chirp.png", "mcl_jukebox_track_5")
-mcl_jukebox.register_record("Winter Feeling", "Tom Peter", "strad", "mcl_jukebox_record_strad.png", "mcl_jukebox_track_6")
-mcl_jukebox.register_record("Synthgroove (Jordach's Mix)", "HeroOfTheWinds", "mellohi", "mcl_jukebox_record_mellohi.png", "mcl_jukebox_track_7")
-mcl_jukebox.register_record("The Clueless Frog (Jordach's Mix)", "SoundHelix", "mall", "mcl_jukebox_record_mall.png", "mcl_jukebox_track_8")
+mcl_jukebox.register_record("Acid Orgy", "Goat Lord", "13", "mcl_jukebox_record_13.png", "mcl_jukebox_track_1")
+mcl_jukebox.register_record("Bob It Low", "DJ Spinn & DJ Rashad", "wait", "mcl_jukebox_record_wait.png", "mcl_jukebox_track_2")
+mcl_jukebox.register_record("Durak", "Goremyka", "blocks", "mcl_jukebox_record_blocks.png", "mcl_jukebox_track_3")
+mcl_jukebox.register_record("Cold Beer Calling My Name", "Luke Combs", "far", "mcl_jukebox_record_far.png", "mcl_jukebox_track_4")
+mcl_jukebox.register_record("They Hung Him on the Cross", "Leadbelly", "chirp", "mcl_jukebox_record_chirp.png", "mcl_jukebox_track_5")
+mcl_jukebox.register_record("Rare RCB hexD.mp3", "Reptilian Club Boyz", "strad", "mcl_jukebox_record_strad.png", "mcl_jukebox_track_6")
+mcl_jukebox.register_record("Holland 1945", "Neutral Milk Hotel", "mellohi", "mcl_jukebox_record_mellohi.png", "mcl_jukebox_track_7")
+mcl_jukebox.register_record("Volume 1 Track 1", "Total Science", "mall", "mcl_jukebox_record_mall.png", "mcl_jukebox_track_8")
 
 --add backward compatibility
 minetest.register_alias("mcl_jukebox:record_1", "mcl_jukebox:record_13")
