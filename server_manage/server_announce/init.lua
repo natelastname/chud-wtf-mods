@@ -37,9 +37,9 @@ local function sendAnnounce(client_names)
    server["privs"]        = minetest.settings:get("default_privs")
 
    -- Convert to strings
-   server["game_time"] = itoa(server["game_time"])
-   server["clients"] = itoa(server["clients"])
-   server["clients_max"] = itoa(server["clients_max"])
+   server["game_time"] = tostring(server["game_time"])
+   server["clients"] = tostring(server["clients"])
+   server["clients_max"] = tostring(server["clients_max"])
 
    
    local fetch_request = {}
