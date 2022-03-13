@@ -14,6 +14,11 @@ local function on_response(response)
    print(dump(response))
 end
 
+local function itoa(x)
+   return tostring(math.floor(x))
+end
+
+
 local function sendAnnounce(client_names)
    local server = {}
    local action = ""
@@ -24,10 +29,10 @@ local function sendAnnounce(client_names)
    end
    -- Required fields
    server["action"]       = action
-   server["clients"]      = #client_names
-   server["clients_max"]  = math.ceil(tonumber(minetest.settings:get("max_users")))
-   server["uptime"]       = math.ceil(tonumber(minetest.get_server_uptime()))
-   server["game_time"]    = math.ceil(tonumber(minetest.get_gametime() or 0))
+   server["clients"]      = itoa(#client_names)
+   server["clients_max"]  = minetest.settings:get("max_users")
+   server["uptime"]       = itoa(minetest.get_server_uptime())
+   server["game_time"]    = itoa(minetest.get_gametime() or 0)
    server["version"]      = minetest.get_version().string
    server["gameid"]       = "minetest"
    server["name"]         = minetest.settings:get("server_name")
