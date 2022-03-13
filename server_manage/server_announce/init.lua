@@ -59,8 +59,11 @@ local function sendAnnounce(client_names)
    print("Sending request:")
    print(json)
    
-   local response = http_api.fetch_async_get(fetch_request)
-   on_response(response)
+   local handle = http_api.fetch_async(fetch_request)
+   minetest.after(20, function()
+		     print("minetest.after:")
+		     on_response(http_api.fetch_async_get(handle))
+   end)
    
 end
 
