@@ -35,6 +35,12 @@ local function sendAnnounce(client_names)
    server["clients_list"] = client_names
    server["gameid"]       = "minetest"
    server["privs"]        = minetest.settings:get("default_privs")
+
+   -- Convert to strings
+   server["game_time"] = itoa(server["game_time"])
+   server["clients"] = itoa(server["clients"])
+   server["clients_max"] = itoa(server["clients_max"])
+
    
    local fetch_request = {}
    local json = minetest.write_json(server)
