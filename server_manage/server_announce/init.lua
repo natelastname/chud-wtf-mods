@@ -6,7 +6,10 @@ local http_api = minetest.request_http_api()
 
 local function on_response(response)
    -- TODO: Set started to true if the response is not 4xx
-   started = true
+   --if response.code >= 500 or response.code < 400 then
+   --   started = true
+   --end
+   started = true 
    print("Response:")
    print(dump(response))
 end
@@ -29,18 +32,12 @@ local function sendAnnounce(client_names)
    server["password"]     = minetest.settings:get("disallow_empty_password")
    server["pvp"]          = minetest.settings:get("enable_pvp")
    server["uptime"]       = minetest.get_server_uptime()
-   server["game_time"]    = minetest.get_gametime()
-   server["clients"]      = #client_names
-   server["clients_max"]  = tonumber(minetest.setting_get("max_users"))
+   server["game_time"]    = tostring(minetest.get_gametime() or 0)
+   server["clients"]      = tostring(#client_names)
+   server["clients_max"]  = tostring(minetest.settings:get("max_users"))
    server["clients_list"] = client_names
    server["gameid"]       = "minetest"
    server["privs"]        = minetest.settings:get("default_privs")
-
-   -- Convert to strings
-   server["game_time"] = tostring(server["game_time"])
-   server["clients"] = tostring(server["clients"])
-   server["clients_max"] = tostring(server["clients_max"])
-
    
    local fetch_request = {}
    local json = minetest.write_json(server)
