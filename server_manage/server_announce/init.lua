@@ -23,7 +23,7 @@ local function sendAnnounce(client_names)
    server["name"]         = minetest.setting:get("server_name")
    server["description"]  = minetest.settings:get("server_description")
    server["version"]      = minetest.get_version().string
-   server["url"]          = minetest:settings:get("server_url")
+   server["url"]          = minetest.settings:get("server_url")
    server["creative"]     = minetest.settings:get("creative_mode")
    server["damage"]       = minetest.settings:get("enable_damage")
    server["password"]     = minetest.settings:get("disallow_empty_password")
