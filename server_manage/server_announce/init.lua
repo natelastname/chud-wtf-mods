@@ -20,7 +20,7 @@ local function sendAnnounce(client_names)
    end
    server["port"]         = tonumber(minetest.settings:get("port"))
    server["address"]      = minetest.settings:get("server_address")
-   server["name"]         = minetest.setting:get("server_name")
+   server["name"]         = minetest.settings:get("server_name")
    server["description"]  = minetest.settings:get("server_description")
    server["version"]      = minetest.get_version().string
    server["url"]          = minetest.settings:get("server_url")
