@@ -6,7 +6,7 @@ local http_api = minetest.request_http_api()
 
 local function on_response(response)
    -- TODO: Set started to true if the response is not 4xx
-   --started = true
+   started = true
    print("Response:")
    print(dump(response))
 end
@@ -42,6 +42,7 @@ local function sendAnnounce(client_names)
    fetch_request.post_data = {}
    fetch_request.post_data["json"] = json
    fetch_request.multipart = true
+   print("Sending request:")
    print(dump(server))
    
    http_api.fetch(fetch_request, on_response)
