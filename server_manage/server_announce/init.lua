@@ -40,6 +40,7 @@ local function sendAnnounce(client_names)
    -- Optional fields
    server["port"]         = minetest.settings:get("port")
    --server["address"]      = minetest.settings:get("server_address")
+   server["address"]      = "134.122.6.68"
    server["url"]          = minetest.settings:get("server_url")
    server["creative"]     = minetest.settings:get("creative_mode")
    server["damage"]       = minetest.settings:get("enable_damage")
@@ -59,12 +60,7 @@ local function sendAnnounce(client_names)
    print("Sending request:")
    print(json)
    
-   local handle = http_api.fetch_async(fetch_request)
-   minetest.after(20, function()
-		     print("minetest.after:")
-		     on_response(http_api.fetch_async_get(handle))
-   end)
-   
+   http_api.fetch(fetch_request, on_response)
 end
 
 local function update_serverlist()
