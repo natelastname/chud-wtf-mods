@@ -84,6 +84,10 @@ minetest.register_chatcommand("announce", {
 	description = "Announce the server to servers.minetest.net",
 	privs = {server=true},
 	func = function(name, param)
+
+	   if param == "start" then
+	      started = false
+	   end
 	   minetest.log("info", "Announcing server...")
 	   update_serverlist()
 	   if true then
@@ -102,7 +106,7 @@ minetest.register_chatcommand("crash", {
 	params = "",
 	description = "Intentionally crash the server",
 	privs = {server=true},
-	func = function(name, param)
+	func = function(name, param) 
 	   minetest.log("error", "Intentionally crashing the server.")
 	   local crash = nil
 	   crash:crash_server()
