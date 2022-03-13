@@ -33,7 +33,7 @@ local function sendAnnounce(client_names)
    server["name"]         = minetest.settings:get("server_name")
    server["description"]  = minetest.settings:get("server_description")
    -- Optional fields
-   server["port"]         = tonumber(minetest.settings:get("port"))
+   server["port"]         = minetest.settings:get("port")
    server["address"]      = minetest.settings:get("server_address")
    server["url"]          = minetest.settings:get("server_url")
    server["creative"]     = minetest.settings:get("creative_mode")
