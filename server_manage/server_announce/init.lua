@@ -16,27 +16,31 @@ end
 
 local function sendAnnounce(client_names)
    local server = {}
+   local action = ""
    if started == true then
-      server["action"] = "update"
+      action = "update"
    else
-      server["action"] = "start"
+      action = "start"
    end
-   server["port"]         = tonumber(minetest.settings:get("port"))
-   server["address"]      = minetest.settings:get("server_address")
+   -- Required fields
+   server["action"]       = action
+   server["clients"]      = #client_names
+   server["clients_max"]  = math.ceil(tonumber(minetest.settings:get("max_users")))
+   server["uptime"]       = math.ceil(tonumber(minetest.get_server_uptime()))
+   server["game_time"]    = math.ceil(tonumber(minetest.get_gametime() or 0))
+   server["version"]      = minetest.get_version().string
+   server["gameid"]       = "minetest"
    server["name"]         = minetest.settings:get("server_name")
    server["description"]  = minetest.settings:get("server_description")
-   server["version"]      = minetest.get_version().string
+   -- Optional fields
+   server["port"]         = tonumber(minetest.settings:get("port"))
+   server["address"]      = minetest.settings:get("server_address")
    server["url"]          = minetest.settings:get("server_url")
    server["creative"]     = minetest.settings:get("creative_mode")
    server["damage"]       = minetest.settings:get("enable_damage")
    server["password"]     = minetest.settings:get("disallow_empty_password")
    server["pvp"]          = minetest.settings:get("enable_pvp")
-   server["uptime"]       = minetest.get_server_uptime()
-   server["game_time"]    = tostring(minetest.get_gametime() or 0)
-   server["clients"]      = tostring(#client_names)
-   server["clients_max"]  = tostring(minetest.settings:get("max_users"))
    server["clients_list"] = client_names
-   server["gameid"]       = "minetest"
    server["privs"]        = minetest.settings:get("default_privs")
    
    local fetch_request = {}
