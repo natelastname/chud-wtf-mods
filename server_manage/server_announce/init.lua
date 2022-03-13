@@ -74,6 +74,10 @@ minetest.register_chatcommand("announce", {
 	privs = {server=true},
 	func = function(name, param)
 	   minetest.log("info", "Announcing server...")
+	   update_serverlist()
+	   if true then
+	      return
+	   end
 	   local status, err = pcall(update_serverlist(), nil)
 	   if status == true then
 	      minetest.log("info", "Request completed.")
