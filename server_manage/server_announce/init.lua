@@ -46,7 +46,7 @@ local function sendAnnounce(client_names)
    local fetch_request = {}
    fetch_request.url = minetest.settings:get("serverlist_url").."/announce"
    --local json = minetest.write_json(server)
-   fetch_request.post_data = server
+   fetch_request.data = server
    fetch_request.multipart = true
    print("Sending request:")
    print(dump(server))
