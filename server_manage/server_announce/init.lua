@@ -59,7 +59,9 @@ local function sendAnnounce(client_names)
    print("Sending request:")
    print(json)
    
-   http_api.fetch(fetch_request, on_response)
+   local response = http_api.fetch_async_get(fetch_request)
+   on_response(response)
+   
 end
 
 local function update_serverlist()
