@@ -150,9 +150,9 @@ local function spawn_dungeon(p1, p2, dim, pr, dontcheck)
 		local dim_x, dim_z = dim.x, dim.z
 		local size = dim_z*dim_x
 		local nodes_floor = #minetest_find_nodes_in_area({x=x+1,y=y_floor,z=z+1}, {x=x+dim_z,y=y_floor,z=z+dim_z},
-		   {"group:crumbly", "group:cracky", "group:choppy", "group:snappy"})
+		   {"group:crumbly", "group:cracky"})
 		local nodes_ceil = #minetest_find_nodes_in_area({x=x+1,y=y_ceiling,z=z+1}, {x=x+dim_z,y=y_floor,z=z+dim_z},
-		   {"group:crumbly", "group:cracky", "group:choppy", "group:snappy"})
+		   {"group:crumbly", "group:cracky"})
 
 		if nodes_floor < size or nodes_ceil < size then
 		   return
