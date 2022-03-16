@@ -2,25 +2,6 @@
 -- Painting textures from Stunt Rally <https://code.google.com/p/vdrift-ogre/>, licensed under CC0.
 
 local paintings = {}
--[[
-{
-   "paintings:White",
-   "paintings:Grey",
-   "paintings:Black",
-   "paintings:Red",
-   "paintings:Yellow",
-   "paintings:Green",
-   "paintings:Cyan",
-   "paintings:Blue",
-   "paintings:Magenta",
-   "paintings:Orange",
-   "paintings:Violet",
-   "paintings:Brown",
-   "paintings:Pink",
-   "paintings:DarkGrey",
-   "paintings:DarkGreen"
-}
-]]--
 
 
 
