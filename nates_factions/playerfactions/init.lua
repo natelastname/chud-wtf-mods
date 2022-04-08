@@ -608,7 +608,7 @@ local function handle_command(name, param)
    elseif action == "home" then
       factions.tp_f_home(name)
    else
-      factions_send_player(name, S("Unknown subcommand. Run '/help f' for help."))
+      factions_send_player(name, "Unknown subcommand. Run '/help f' for help.")
    end
    return true
 end
