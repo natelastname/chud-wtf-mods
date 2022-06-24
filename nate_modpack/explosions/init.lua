@@ -370,8 +370,9 @@ local function trace_explode(pos, strength, raydirs, radius)
     odir_y = odir_y / odir_len
     odir_z = odir_z / odir_len
 
-    local dmg = rstr * 0.2
-
+    -- local dmg = rstr * 0.05
+    local dmg = 2
+    
     if not callback or
         callback(obj, rstr, { x = odir_x, y = odir_y, z = odir_z }) then
       if not obj:get_armor_groups().immortal then
@@ -384,7 +385,7 @@ local function trace_explode(pos, strength, raydirs, radius)
     if not callback and not obj:is_player() then
        local vel = obj:get_velocity()
        if vel ~= nil then
-	  local push = rstr * 0.05
+	  local push = math.min(rstr * 0.05, 5)
 	  
 	  vel.x = vel.x + odir_x * push
 	  vel.y = vel.y + odir_y * push
@@ -394,12 +395,13 @@ local function trace_explode(pos, strength, raydirs, radius)
        end
     end
     if not callback and obj:is_player() then
-      local push = rstr * 0.05
-      local vel = {}
-      vel.x = odir_x * push
-      vel.y = odir_y * push
-      vel.z = odir_z * push
-      obj:add_velocity(vel)
+       --local push = rstr * 0.05
+       local push = math.min(rstr * 0.05, 5)
+       local vel = {}
+       vel.x = odir_x * push
+       vel.y = odir_y * push
+       vel.z = odir_z * push
+       obj:add_velocity(vel)
     end
   end
 
