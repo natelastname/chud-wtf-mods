@@ -323,7 +323,7 @@ end
 function factions.info(name, faction_name)
    if faction_name == nil then
       local player_factions = factions.get_player_factions(name)
-      if #player_factions == 1 then
+      if player_factions ~= nil and #player_factions == 1 then
 	 faction_name = player_factions[1]
       else
 	 factions_send_player(name, S("You are in many factions, you have to choose one of them: @1.", table.concat(player_factions, ", ")))
