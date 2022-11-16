@@ -19,6 +19,10 @@ periodic_msgs.counter = 0
 periodic_msgs.color = "#ff9999"
 periodic_msgs.label = "<http://chud.wtf> "
 
+
+local discordmt_enabled = minetest.get_modpath("discordmt")
+
+
 function print_message()
    periodic_msgs.counter = periodic_msgs.counter + 1
    if periodic_msgs.counter > #periodic_msgs.msgs then
@@ -27,7 +31,13 @@ function print_message()
    local msg = periodic_msgs.msgs[periodic_msgs.counter]
    msg = periodic_msgs.label .. msg
    msg = minetest.colorize(periodic_msgs.color, msg)
-   minetest.chat_send_all(msg)
+   if discordmt_enabled then
+      minetest.log("action", "DISCORDMT ENABLED")
+      discord.chat_send_all(msg)
+   else
+      minetest.log("action", "DISCORDMT not enabled")
+      minetest.chat_send_all(msg)
+   end
    minetest.after(periodic_msgs.interval_secs, print_message)
 end
 
