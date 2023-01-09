@@ -9,8 +9,10 @@ minetest.register_on_craft(function(itemstack, tool_capabilities, player,  old_c
 		local def_dg = itemstack:get_tool_capabilities().damage_groups
 		local default_atk = 0
 		local atk = itemstack:get_tool_capabilities().damage_groups.fleshy
+		
+		print("Crafting:" .. itemstack:get_description())
 ------------------------------------------------------
-		if itemstack:get_definition().tool_capabilities.groupcaps.cracky ~= nil then
+		if itemstack:get_definition().tool_capabilities.groupcaps ~= nil and itemstack:get_definition().tool_capabilities.groupcaps.cracky ~= nil then
 			 def_cracky3 = itemstack:get_tool_capabilities().groupcaps.cracky.times[3] or 5
 			 def_cracky2 = itemstack:get_tool_capabilities().groupcaps.cracky.times[2] or 600000
 			 def_cracky1 = itemstack:get_tool_capabilities().groupcaps.cracky.times[1] or 600000
