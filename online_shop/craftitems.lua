@@ -53,11 +53,15 @@ minetest.register_craft({
     recipe = {"default:copper_ingot", "online_shop:plastic_fiberglass", "dye:dark_green"}
 })
 
+
+--[[
 minetest.register_craft({
     type = "shapeless",
     output = "currency:shop",
     recipe = {"default:sign_wall_wood", "default:chest_locked"}
 })
+]]--
+
 
 minetest.register_craft({
     type = "shapeless",
