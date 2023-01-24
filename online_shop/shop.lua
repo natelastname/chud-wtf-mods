@@ -26,7 +26,7 @@ function online_shop.shop_server(pos)
       "list["..list_name..";owner_gives;4.5,3;4,2;]"..
       "field[0.3,5.548;4,1;store_name;Store Name:;"..store_name_t.."]"..
       "button_exit[5,5.2;3,1;finish;Finish]"..
-   "field[0.3,6.7;4,1;item_label;Item Label (i.e. 99 Clay Blocks for 10mg):;"..item_label_t.."]"..
+      "field[0.3,6.7;4,1;item_label;Item Label (i.e. 99 Clay Blocks for 10mg):;"..item_label_t.."]"..
       "list[current_player;main;0.25,7.5;8,4;]"
    return formspec
 end
@@ -35,65 +35,65 @@ end
 
 
 minetest.register_node("online_shop:shop_server", {
-			  description = "Shop Server",
-			  tiles = {
-			     "shop_shop_server_top.png",
-			     "shop_shop_server_top.png",
-			     "shop_shop_server_side.png",
-			     "shop_shop_server_side.png",
-			     "shop_shop_server_side.png",
-			     "shop_shop_server_front.png"
-			  },
-			  paramtype = "light",
-			  paramtype2 = "facedir",
-			  sunlight_propagates = false,
-			  is_ground_content = false,
-			  groups = {choppy = 3, oddly_breakable_by_hand = 2, wood = 1},
-			  sounds = default.node_sound_wood_defaults(),
-			  
-			  after_place_node = function(pos, placer, itemstack)
-			     local player_meta = placer:get_meta()
-			     if player_meta:get_string("online_shop_banstate") ~= "banned" then
-				local owner = placer:get_player_name()
-				local meta = minetest.get_meta(pos)
-				meta:set_string("infotext", "Shopping Server (owned by "..owner..")")
-				meta:set_string("owner", owner)
-				meta:set_string("store_name", "")
-				meta:set_string("item_label", "")
-				local inv = meta:get_inventory()
-				inv:set_size("customers_gave", 4*2)
-				inv:set_size("stock", 4*2)
-				inv:set_size("owner_wants", 4*2)
-				inv:set_size("owner_gives", 4*2)
-			     else
-				minetest.remove_node(pos)
-				minetest.chat_send_player(placer:get_player_name(), "You have been banned from creating Shop Servers")
-			     end
-			  end,
+                          description = "Shop Server",
+                          tiles = {
+                             "shop_shop_server_top.png",
+                             "shop_shop_server_top.png",
+                             "shop_shop_server_side.png",
+                             "shop_shop_server_side.png",
+                             "shop_shop_server_side.png",
+                             "shop_shop_server_front.png"
+                          },
+                          paramtype = "light",
+                          paramtype2 = "facedir",
+                          sunlight_propagates = false,
+                          is_ground_content = false,
+                          groups = {choppy = 3, oddly_breakable_by_hand = 2, wood = 1},
+                          sounds = default.node_sound_wood_defaults(),
+                          
+                          after_place_node = function(pos, placer, itemstack)
+                             local player_meta = placer:get_meta()
+                             if player_meta:get_string("online_shop_banstate") ~= "banned" then
+                                local owner = placer:get_player_name()
+                                local meta = minetest.get_meta(pos)
+                                meta:set_string("infotext", "Shopping Server (owned by "..owner..")")
+                                meta:set_string("owner", owner)
+                                meta:set_string("store_name", "")
+                                meta:set_string("item_label", "")
+                                local inv = meta:get_inventory()
+                                inv:set_size("customers_gave", 4*2)
+                                inv:set_size("stock", 4*2)
+                                inv:set_size("owner_wants", 4*2)
+                                inv:set_size("owner_gives", 4*2)
+                             else
+                                minetest.remove_node(pos)
+                                minetest.chat_send_player(placer:get_player_name(), "You have been banned from creating Shop Servers")
+                             end
+                          end,
 
-			  on_destruct = function(pos)
-			     local meta = minetest.get_meta(pos)
-			     online_shop.unregister_shop({
-				   store_name = meta:get_string("store_name"),
-				   item_label = meta:get_string("item_label"),
-				   owner = meta:get_string("owner"),
-				   pos = pos
-			     })
-			  end,
-			  
-			  on_rightclick = function(pos, node, clicker, itemstack)
-			     -- Always open the admin interface when a shop server is opened by right clicking
-			     -- This prevents the shop server from being used to hide items.
-			     local context = get_context(clicker:get_player_name())
-			     context.pos = pos
-			     minetest.show_formspec(clicker:get_player_name(), "online_shop:shop_server_formspec", online_shop.shop_server(pos))
-			  end
+                          on_destruct = function(pos)
+                             local meta = minetest.get_meta(pos)
+                             online_shop.unregister_shop({
+                                   store_name = meta:get_string("store_name"),
+                                   item_label = meta:get_string("item_label"),
+                                   owner = meta:get_string("owner"),
+                                   pos = pos
+                             })
+                          end,
+                          
+                          on_rightclick = function(pos, node, clicker, itemstack)
+                             -- Always open the admin interface when a shop server is opened by right clicking
+                             -- This prevents the shop server from being used to hide items.
+                             local context = get_context(clicker:get_player_name())
+                             context.pos = pos
+                             minetest.show_formspec(clicker:get_player_name(), "online_shop:shop_server_formspec", online_shop.shop_server(pos))
+                          end
 })
 
 minetest.register_craft({
-    type = "shapeless",
-    output = "online_shop:shop_server",
-    recipe = {"currency:shop", "online_shop:shop_server_motherboard"}
+      type = "shapeless",
+      output = "online_shop:shop_server",
+      recipe = {"default:chest_locked", "online_shop:shop_server_motherboard"}
 })
 
 
@@ -162,12 +162,12 @@ end
 
 --[[
    Shop def example:
-      online_shop.register_shop({
-	    store_name = "Store name",
-	    item_label = "Item label",
-            owner = "owner name",
-	    pos = position vector
-      })
+   online_shop.register_shop({
+   store_name = "Store name",
+   item_label = "Item label",
+   owner = "owner name",
+   pos = position vector
+   })
    
    An online shop is valid if pos is the position of an online shop node
    whose metadata has a store_name that agrees with the argument store_name. 
@@ -264,13 +264,13 @@ end
 minetest.register_on_player_receive_fields(function(sender, formname, fields)
       -- Sender: player object of user submitting the formspec
       if formname ~= "online_shop:shop_server_formspec" then
-	 return
+         return
       end
       if fields.finish == nil then
-	 return
+         return
       end
       if fields.finish == "" then
-	 return
+         return
       end
       local sender_name = sender:get_player_name()
       local context = get_context(sender:get_player_name())
@@ -284,31 +284,31 @@ minetest.register_on_player_receive_fields(function(sender, formname, fields)
       local new_store_name = fields.store_name
       
       if minetest.get_node(pos).name ~= "online_shop:shop_server" then
-	 -- This (probably) indicates that the shop got destroyed while in use.
-	 minetest.chat_send_player(sender_name, "Operation failed, shop server no longer exists.")
-	 return
+         -- This (probably) indicates that the shop got destroyed while in use.
+         minetest.chat_send_player(sender_name, "Operation failed, shop server no longer exists.")
+         return
       end
       
       
       if new_store_name == nil or new_store_name == ""
-      or new_item_label == nil or new_item_label == "" then
-	 -- This indicates that the fields were not valid.
-	 minetest.chat_send_player(sender_name, "Operation failed. Enter a valid 'Store Name' and 'Item Label'.")
-	 return
+         or new_item_label == nil or new_item_label == "" then
+         -- This indicates that the fields were not valid.
+         minetest.chat_send_player(sender_name, "Operation failed. Enter a valid 'Store Name' and 'Item Label'.")
+         return
       end
       
       online_shop.unregister_shop({
-	    store_name = orig_store_name,
-	    item_label = orig_item_label,
+            store_name = orig_store_name,
+            item_label = orig_item_label,
             owner = meta:get_string("owner"),
-	    pos = pos
+            pos = pos
       })
       
       local result, msg = online_shop.register_shop({
-	    store_name = fields.store_name,
-	    item_label = fields.item_label,
+            store_name = fields.store_name,
+            item_label = fields.item_label,
             owner = meta:get_string("owner"),
-	    pos = pos
+            pos = pos
       })
       
       minetest.chat_send_player(sender_name, msg)
