@@ -31,7 +31,7 @@ end
 factions.mode_unique_faction = minetest.settings:get_bool("player_factions.mode_unique_faction", true)
 factions.max_members_list = tonumber(minetest.settings:get("player_factions.max_members_list")) or 50
 
-local function save_factions()
+function factions.save_factions()
    storage:set_string("facts", minetest.serialize(facts))
 end
 
@@ -167,7 +167,7 @@ function factions.chown(fname, owner)
       return false
    end
    facts[fname].owner = owner
-   save_factions()
+   factions.save_factions()
    return true
 end
 
@@ -181,9 +181,10 @@ function factions.register_faction(fname, founder, pw)
       password = pw,
       members = {[founder] = true},
       home = "",
+      time_created = os.time(),
       last_online = os.time()
    }
-   save_factions()
+   factions.save_factions()
    return true
 end
 
@@ -192,7 +193,7 @@ function factions.disband_faction(fname)
       return false
    end
    facts[fname] = nil
-   save_factions()
+   factions.save_factions()
    simple_protection.delete_faction_claims(fname)
    return true
 end
@@ -209,7 +210,7 @@ function factions.set_password(fname, password)
       return false
    end
    facts[fname].password = password
-   save_factions()
+   factions.save_factions()
    return true
 end
 
@@ -218,7 +219,7 @@ function factions.join_faction(fname, player)
       return false
    end
    facts[fname].members[player] = true
-   save_factions()
+   factions.save_factions()
    return true
 end
 
@@ -227,7 +228,7 @@ function factions.leave_faction(fname, player_name)
       return false
    end
    facts[fname].members[player_name] = nil
-   save_factions()
+   factions.save_factions()
    return true
 end
 
@@ -260,7 +261,7 @@ function factions.set_f_home(player_name)
 
    
    facts[fname].home = pos
-   save_factions()
+   factions.save_factions()
    factions_send_player(player_name, "Faction home successfully set.")
 end
 
