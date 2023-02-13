@@ -1,17 +1,14 @@
 
 
 minetest.register_on_craft(function(itemstack, tool_capabilities, player,  old_craft_grid, craft_inv)
-      minetest.log("action", "=========================================")
-      minetest.log("action", string.format("Crafting %s", itemstack:get_description()))
-      minetest.log("action", "=========================================")
       if itemstack:get_definition().tool_capabilities == nil then
          return
       end
 
       if itemstack:get_definition().tool_capabilities.groupcaps ~= nil then
-         minetest.log("action", "Item has groupcaps")
+         minetest.log("action", "Item has groupcaps, applying modifiers")
       else
-         minetest.log("action", "This item may be the one that crashed the server (groupcaps is nil.)")
+         minetest.log("action", "Groupcaps is nil, not applying any modifiers")
          return
       end
 
