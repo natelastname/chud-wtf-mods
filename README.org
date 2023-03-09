@@ -1,0 +1,189 @@
+# -*- mode: org -*-
+#+TITLE: Chud.wtf Minetest Game
+#+AUTHOR: nate
+#+DATE: <2023-02-21>
+
+* What is chud.wtf?
+
+A fully self-contained mod configuration for Minetest built on top of the default Minetest game. Originally developed for use on the server known as "Chud.wtf". Various mods intended for running a public server are included, but it is also playable as a single-player game.
+
+- Visit website: http://chud.wtf
+- Join the [[https://discord.gg/v2CjfGknZV][Discord]]
+- [[https://www.minetest.net/downloads/][Download Minetest]]
+
+* Feature summary
+
+Chud.wtf combines the best elements of multiple different Minetest game modes, as well as a few exclusive mods developed specifically for the server.
+
+- Mods ported from Mineclone to the default game:
+  - =mcl_dungeons=, =mobs_mc=, =mineclone_dungeons= and more
+- Mods ported over from Capture the Flag:
+  - =ctf_guns=, entity name tags
+- Popular mods for survival gameplay
+- Quality-of-life mods
+  - Unified inventory, =display_modpack=
+- A Terraria-style tool system with random modifiers
+- Several mods required for running a public server (spawn protection, PVP safezones, hacking mitigation)
+- Currency, shops
+- A custom player factions mods with raiding (See below)
+- A greatly improved system for explosions including blast resistances
+- Lots of random custom content: paintings, jukeboxes, cake, etc. etc.
+- More
+
+* An integrated experience
+
+Mods are never included in chud.wtf without being audited to ensure that they are well-engineered, as well as verify that they won't conflict with other mods. Sometimes, changes are necessary. As a result, many of the mods included in this repo are forks of the versions found on https://content.minetest.net/ or elsewhere.
+
+* Player factions
+Player factions and PVP are an integral part of Chud.wtf. In order to set a home location in Chud.wtf, you must be a member of a faction. Create a faction by typing
+
+#+begin_example
+/f create [name] [password]
+#+end_example
+
+To join an existing faction, type
+
+#+begin_example
+/f join [name] [password]
+#+end_example
+
+Type =/help f= in chat to see a complete list of faction related commands.
+
+** Claiming land
+
+Here is a summary of how to claim land on this server:
+
+- In order to claim land, join a faction and type =/f claim=.
+- To set a home position for your faction, type =/f sethome.=
+- To teleport to your faction's home position, type =/f home=
+- Use the command =/f radar= to see a map of nearby claims.
+- Type =/help f= to see a list of faction commands
+
+** PVP
+
+Be careful when you leave spawn because PVP is enabled everywhere.
+
+Nametags are visible through walls from 50 blocks away.
+
+** Money/drugs
+
+
+On this server, the best way to make money is by selling drugs. Drug seeds can be purchased in spawn and grown like any other crop. Finished drugs (weed, heroin and cocaine) can be sold in spawn for profit.
+
+When you are carrying drug paraphernalia, you cannot teleport using =/f home= or =/spawn=. This means that you have to walk from your base back to spawn if you want to sell drugs.
+
+Building your base far away from spawn means that you are safer from raiders, but it also means that you have to walk a longer distance to sell drugs.
+
+** Raiding
+
+You cannot mine nodes owned by factions other than your own, but you can destroy them using Covid-19 vaccines. Left click while holding a vaccine to launch an explosive projectile that destroys enemy blocks. There are currently two types of vaccines:
+
+- *The Johnson and Johnson (=covid19:vaccine_jj=)*
+  - Can be found in dungeon chests or purchased in spawn.
+  - Blast radius: 5 blocks
+  - Blast strength: 1250
+- *The Pfizer (=covid19:vaccine_pfizer=)*
+  - Can be crafted from 5 Johnson and Johnson vaccines.
+  - Blast radius: 1.75 blocks
+  - Blast strength: 100000
+
+** Explosive resistances
+
+There are two tiers of blocks.
+
+- Tier 1 blocks: can be destroyed with Johnson and Johnson vaccines
+- Tier 2 blocks: can only be destroyed with Pfizer vaccines.
+
+The following is a list of all tier 2 blocks.
+
+#+begin_example
+| [block name]                | [blast resistance] |
+| sapphire:sapphire_block     |               1500 |
+| ruby:ruby_block             |               1500 |
+| moreores:silver_block       |               1500 |
+| moreores:mithril_block      |               1500 |
+| ethereal:crystal_block      |               1500 |
+| emerald:emerald_block       |               1500 |
+| doors:door_steel_c          |               1500 |
+| doors:door_steel_a          |               1500 |
+| default:tinblock            |               1500 |
+| default:steelblock          |               1500 |
+| default:mese                |               1500 |
+| default:goldblock           |               1500 |
+| default:diamondblock        |               1500 |
+| default:copperblock         |               1500 |
+| default:bronzeblock         |               1500 |
+| basic_materials:brass_block |               1500 |
+| amethyst:amethyst_block     |               1500 |
+#+end_example
+
+
+
+* Example world conf file
+
+This is required to get Chud.wtf to work as intended.
+
+#+begin_example
+# privileges that normal players get
+default_privs = interact, shout, zoom
+
+give_initial_stuff = true
+initial_stuff = default:sword_steel,default:pick_steel,default:axe_steel,default:shovel_steel,default:torch 99,default:apple 99
+
+# Pvp areas
+pvp_areas.enable_pvp = true
+pvp_areas.safemode = true
+pvp_areas.label = Safezone - PVP disabled.
+
+# Mobs
+mobs_spawn_protected = false
+
+# hbsprint and hudbars
+hudbars_bar_type = statbar_modern
+hudbars_autohide_stamina = false
+sprint_speed = 2.5
+sprint_jump = 1.25
+sprint_starve = false
+sprint_stamina = true
+sprint_stamina_drain = 0.75
+sprint_stamina_heal = 1
+
+# Hide name tags of players beyond a certain distance
+# Note that player_transfer_distance is measures in chunks,
+# so you have to multiply by 16 to get the number of blocks
+player_transfer_distance = 30
+unlimited_player_transfer_distance = false
+
+# Chat3: highlight chat in blue for players within [this many] blocks
+chat3.near = 64
+chat3.alt_support = false
+
+
+# 3d armor nerfs
+armor_heal_multiplier = 0
+armor_set_multiplier = 1
+armor_level_multiplier = 0.8
+
+# Rank related stuff
+ranks.prefix_chat = true
+ranks.prefix_nametag = false
+
+# Currency mod
+currency.income_enabled = true
+currency.income_item = currency:minegeld
+currency.income_count = 1
+currency.income_period = 300
+
+unified_inventory_bags = false
+
+enable_server = false
+wieldview_update_time = 2
+enable_damage = true
+wieldview_node_tiles = false
+mainmenu_last_selected_world = 1
+menu_last_game = minetest
+creative_mode = false
+world_config_selected_mod = 65
+#+end_example
+
+NOTE: Additional settings are required for running a public server.
