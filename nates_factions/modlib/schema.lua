@@ -29,18 +29,32 @@ function generate_settingtypes(self)
 		default = default and "true" or "false"
 	elseif typ == "string" then
 		settingtype = "string"
+		if self.values then
+			local values = {}
+			for value in pairs(self.values) do
+				if value:find"," then
+					values = nil
+					break
+				end
+				table.insert(values, value)
+			end
+			if values then
+				settingtype = "enum"
+				type_args = table.concat(values, ",")
+			end
+		end
 	elseif typ == "number" then
 		settingtype = self.int and "int" or "float"
-		if self.min or self.max then
+		if self.range and (self.range.min or self.range.max) then
 			-- TODO handle exclusive min/max
-			type_args = (self.int and "%d %d" or "%f %f"):format(self.min or (2 ^ -30), self.max or (2 ^ 30))
+			type_args = (self.int and "%d %d" or "%f %f"):format(self.range.min or (2 ^ -30), self.range.max or (2 ^ 30))
 		end
 	elseif typ == "table" then
 		local settings = {}
 		if self._level > 0 then
 			-- HACK: Minetest automatically adds the modname
 			-- TODO simple names (not modname.field.other_field)
-			settings = {"[" .. table.concat(modlib.table.repetition("*", self._level)) .. self.name .. "]"}
+			settings = {"[" .. ("*"):rep(self._level - 1) .. self.name .. "]"}
 		end
 		local function setting(key, value_scheme)
 			key = tostring(key)
@@ -54,11 +68,19 @@ function generate_settingtypes(self)
 		for key in pairs(self.entries or {}) do
 			table.insert(keys, key)
 		end
-		table.sort(keys)
+		table.sort(keys, function(key, other_key)
+			-- Force leaves before subtrees to prevent them from being accidentally graphically treated as part of the subtree
+			local is_subtree = self.entries[key].type == "table"
+			local other_is_subtree = self.entries[other_key].type == "table"
+			if is_subtree ~= other_is_subtree then
+				return not is_subtree
+			end
+			return key < other_key
+		end)
 		for _, key in ipairs(keys) do
 			setting(key, self.entries[key])
 		end
-		return table.concat(settings, "\n")
+		return table.concat(settings, "\n\n")
 	end
 	if not typ then
 		return ""
@@ -141,14 +163,14 @@ function generate_markdown(self)
 	end
 	if self.range then
 		if self.range.min then
-			line("&gt;= " .. self.range.min)
+			line("&gt;= `" .. self.range.min .. "`")
 		elseif self.range.min_exclusive then
-			line("&gt; " .. self.range.min_exclusive)
+			line("&gt; `" .. self.range.min_exclusive .. "`")
 		end
 		if self.range.max then
-			line("&lt;= " .. self.range.max)
+			line("&lt;= `" .. self.range.max .. "`")
 		elseif self.range.max_exclusive then
-			line("&lt; " .. self.range.max_exclusive)
+			line("&lt; `" .. self.range.max_exclusive .. "`")
 		end
 	end
 	if self.values then
@@ -182,10 +204,10 @@ function load(self, override, params)
 		end
 	end
 	if override == nil and not converted then
-		if self.default ~= nil then
-			return self.default
-		elseif self.type == "table" then
+		if self.type == "table" and self.default == nil then
 			override = {}
+		else
+			return self.default
 		end
 	end
 	local _error = error
@@ -295,7 +317,10 @@ function load(self, override, params)
 			end
 		end
 		assert((not self.list) or modlib.table.count(override) == #override, "list")
-	else
+	end
+	-- Apply the values check only for primitive types where table indexing is by value;
+	-- the `values` field has a different meaning for tables (constraint all values must fulfill)
+	if self.type ~= "table" then
 		assert((not self.values) or self.values[override], "values")
 	end
 	if self.func then self.func(override) end

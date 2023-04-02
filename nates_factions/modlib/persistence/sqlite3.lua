@@ -3,8 +3,6 @@ local assert, error, math_huge, modlib, minetest, setmetatable, type, table_inse
 
 local sqlite3 = ...
 
---! experimental
-
 --[[
 	Currently uses reference counting to immediately delete tables which aren't reachable from the root table anymore, which has two issues:
 	1. Deletion might trigger a large deletion chain
@@ -15,10 +13,9 @@ local sqlite3 = ...
 	Weak tables are of no use here, as we need to be notified when a reference is dropped
 ]]
 
-local _ENV = {}
-setfenv(1, _ENV)
-local metatable = {__index = _ENV}
-_ENV.metatable = metatable
+local ptab = {} -- SQLite3-backed implementation for a persistent Lua table ("ptab")
+local metatable = {__index = ptab}
+ptab.metatable = metatable
 
 -- Note: keys may not be marked as weak references: wouldn't close the database: see persistence/lua_log_file.lua
 local databases = {}
@@ -39,14 +36,14 @@ local function increment_highest_table_id(self)
 	return self.highest_table_id
 end
 
-function new(file_path, root)
+function ptab.new(file_path, root)
 	return setmetatable({
 		database = sqlite3.open(file_path),
 		root = root
 	}, metatable)
 end
 
-function _ENV.setmetatable(self)
+function ptab.setmetatable(self)
 	assert(self.database and self.root)
 	return setmetatable(self, metatable)
 end
@@ -97,6 +94,7 @@ function set(self, table, key, value)
 		add_table(self, key)
 		add_table(self, value)
 	end
+	local previous_value = table[key]
 	if type(previous_value) == "table" then
 		decrement_reference_count(self, previous_value)
 	end
@@ -141,7 +139,7 @@ local function exec(self, sql)
 	end
 end
 
-function init(self)
+function ptab:init()
 	local database = self.database
 	local function prepare(sql)
 		local stmt = database:prepare(sql)
@@ -209,7 +207,7 @@ CREATE TABLE IF NOT EXISTS table_entries (
 		-- Null is unused
 		error("unsupported type: " .. type_)
 	end
-	-- Order by key_content to have retrieve list parts in the correct order, making it easier for Lua
+	-- Order by key_content to retrieve list parts in the correct order, making it easier for Lua
 	for table_id, key_type, key, value_type, value in self.database:urows"SELECT * FROM table_entries ORDER BY table_id, key_type, key" do
 		local table = tables[table_id] or {}
 		counts[table] = counts[table] or 1
@@ -229,15 +227,18 @@ CREATE TABLE IF NOT EXISTS table_entries (
 	databases[self] = true
 end
 
-function rewrite(self)
+function ptab:rewrite()
+	exec(self, "BEGIN EXCLUSIVE TRANSACTION")
 	exec(self, "DELETE FROM table_entries")
 	self.highest_table_id = 0
 	self.table_ids = {}
 	self.counts = {}
 	add_table(self, self.root)
+	exec(self, "COMMIT TRANSACTION")
 end
 
-function _ENV.set(self, table, key, value)
+function ptab:set(table, key, value)
+	exec(self, "BEGIN EXCLUSIVE TRANSACTION")
 	local previous_value = table[key]
 	if previous_value == value then
 		-- no change
@@ -245,13 +246,14 @@ function _ENV.set(self, table, key, value)
 	end
 	set(self, table, key, value)
 	table[key] = value
+	exec(self, "COMMIT TRANSACTION")
 end
 
-function set_root(self, key, value)
-	return _ENV.set(self, self.root, key, value)
+function ptab:set_root(key, value)
+	return self:set(self.root, key, value)
 end
 
-function collectgarbage(self)
+function ptab:collectgarbage()
 	local marked = {}
 	local function mark(table)
 		if type(table) ~= "table" or marked[table] then return end
@@ -269,7 +271,7 @@ function collectgarbage(self)
 	end
 end
 
-function defragment_ids(self)
+function ptab:defragment_ids()
 	local ids = {}
 	for _, id in pairs(self.table_ids) do
 		table_insert(ids, id)
@@ -299,7 +301,7 @@ local function finalize_statements(table)
 	end
 end
 
-function close(self)
+function ptab:close()
 	finalize_statements(self._prepared)
 	self.database:close()
 	databases[self] = nil
@@ -313,4 +315,4 @@ if minetest then
 	end)
 end
 
-return _ENV
+return ptab

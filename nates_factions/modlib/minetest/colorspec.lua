@@ -127,6 +127,7 @@ named_colors = {
 	plum = 0xdda0dd,
 	powderblue = 0xb0e0e6,
 	purple = 0x800080,
+	rebeccapurple = 0x663399,
 	red = 0xff0000,
 	rosybrown = 0xbc8f8f,
 	royalblue = 0x4169e1,
@@ -203,14 +204,17 @@ function colorspec.from_string(string)
 	if not number then
 		local name, alpha_text = string:match("^([a-z]+)" .. hex .. "$")
 		if name then
-			if alpha_text:len() ~= 2 then
+			if alpha_text:len() > 2 then
 				return
 			end
 			number = named_colors[name]
 			if not number then
 				return
 			end
-			alpha = tonumber(alpha_text, 16)
+			alpha = tonumber(alpha_text, 0x10)
+			if alpha_text:len() == 1 then
+				alpha = alpha * 0x11
+			end
 		end
 	end
 	if number then
@@ -220,7 +224,7 @@ function colorspec.from_string(string)
 	if not hex_text then
 		return
 	end
-	local len, num = hex_text:len(), tonumber(hex_text, 16)
+	local len, num = hex_text:len(), tonumber(hex_text, 0x10)
 	if len == 8 then
 		return colorspec.from_number_rgba(num)
 	end
@@ -229,17 +233,17 @@ function colorspec.from_string(string)
 	end
 	if len == 4 then
 		return colorspec.from_table{
-			a = (num % 16) * 17,
-			b = (floor(num / 16) % 16) * 17,
-			g = (floor(num / (16 ^ 2)) % 16) * 17,
-			r = (floor(num / (16 ^ 3)) % 16) * 17
+			a = (num % 0x10) * 0x11,
+			b = (floor(num / 0x10) % 0x10) * 0x11,
+			g = (floor(num / (0x100)) % 0x10) * 0x11,
+			r = (floor(num / (0x1000)) % 0x10) * 0x11
 		}
 	end
 	if len == 3 then
 		return colorspec.from_table{
-			b = (num % 16) * 17,
-			g = (floor(num / 16) % 16) * 17,
-			r = (floor(num / (16 ^ 2)) % 16) * 17
+			b = (num % 0x10) * 0x11,
+			g = (floor(num / 0x10) % 0x10) * 0x11,
+			r = (floor(num / (0x100)) % 0x10) * 0x11
 		}
 	end
 end

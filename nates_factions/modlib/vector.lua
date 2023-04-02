@@ -29,6 +29,7 @@ metatable = {
 		if index ~= nil then
 			return rawset(table, index, value)
 		end
+		return rawset(table, key, value)
 	end
 }
 
@@ -36,6 +37,13 @@ function new(v)
 	return setmetatable(v, metatable)
 end
 
+function zeros(n)
+	local v = {}
+	for i = 1, n do
+		v[i] = 0
+	end
+	return new(v)
+end
 function from_xyzw(v)
 	return new{v.x, v.y, v.z, v.w}
 end
@@ -62,24 +70,6 @@ end
 
 metatable.__eq = equals
 
-function less_than(v, w)
-	for k, v in pairs(v) do
-		if v >= w[k] then return false end
-	end
-	return true
-end
-
-metatable.__lt = less_than
-
-function less_or_equal(v, w)
-	for k, v in pairs(v) do
-		if v > w[k] then return false end
-	end
-	return true
-end
-
-metatable.__le = less_or_equal
-
 function combine(v, w, f)
 	local new_vector = {}
 	for key, value in pairs(v) do
@@ -105,9 +95,11 @@ function combinator(f)
 end
 
 function invert(v)
+	local res = {}
 	for key, value in pairs(v) do
-		v[key] = -value
+		res[key] = -value
 	end
+	return new(res)
 end
 
 add, add_scalar = combinator(function(v, w) return v + w end)
@@ -153,6 +145,19 @@ function normalize(v)
 	return divide_scalar(v, length(v))
 end
 
+function normalize_zero(v)
+	local len = length(v)
+	if len == 0 then
+		-- Return a zeroed vector with the same keys
+		local zeroed = {}
+		for k in pairs(v) do
+			zeroed[k] = 0
+		end
+		return new(zeroed)
+	end
+	return divide_scalar(v, len)
+end
+
 function floor(v)
 	return apply(v, math.floor)
 end
@@ -182,6 +187,10 @@ function dot(v, w)
 	return sum
 end
 
+function reflect(v, normal --[[**normalized** plane normal vector]])
+	return subtract(v, multiply_scalar(normal, 2 * dot(v, normal))) -- reflection of v at the plane
+end
+
 --+ Angle between two vectors
 --> Signed angle in radians
 function angle(v, w)
@@ -189,11 +198,27 @@ function angle(v, w)
 	return math.acos(dot(v, w) / length(v) / length(w))
 end
 
+-- See https://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToAngle/
+function axis_angle3(euler_rotation)
+	assert(#euler_rotation == 3)
+	euler_rotation = divide_scalar(euler_rotation, 2)
+	local cos = apply(euler_rotation, math.cos)
+	local sin = apply(euler_rotation, math.sin)
+	return normalize_zero{
+		sin[1] * sin[2] * cos[3] + cos[1] * cos[2] * sin[3],
+		sin[1] * cos[2] * cos[3] + cos[1] * sin[2] * sin[3],
+		cos[1] * sin[2] * cos[3] - sin[1] * cos[2] * sin[3],
+	}, 2 * math.acos(cos[1] * cos[2] * cos[3] - sin[1] * sin[2] * sin[3])
+end
+
 -- Uses Rodrigues' rotation formula
+-- axis must be normalized
 function rotate3(v, axis, angle)
+	assert(#v == 3 and #axis == 3)
 	local cos = math.cos(angle)
 	return multiply_scalar(v, cos)
-		+ multiply_scalar(cross3(axis, v), math.sin(angle))
+		-- Minetest's coordinate system is *left-handed*, so `v` and `axis` must be swapped here
+		+ multiply_scalar(cross3(v, axis), math.sin(angle))
 		+ multiply_scalar(axis, dot(axis, v) * (1 - cos))
 end
 
@@ -206,8 +231,7 @@ function box_box_collision(diff, box, other_box)
 	return true
 end
 
---+ Möller-Trumbore
-function ray_triangle_intersection(origin, direction, triangle)
+local function moeller_trumbore(origin, direction, triangle, is_tri)
 	local point_1, point_2, point_3 = unpack(triangle)
 	local edge_1, edge_2 = subtract(point_2, point_1), subtract(point_3, point_1)
 	local h = cross3(direction, edge_2)
@@ -223,13 +247,21 @@ function ray_triangle_intersection(origin, direction, triangle)
 	end
 	local q = cross3(diff, edge_1)
 	local v = f * dot(direction, q)
-	if v < 0 or u + v > 1 then
+	if v < 0 or (is_tri and u or 0) + v > 1 then
 		return
 	end
 	local pos_on_line = f * dot(edge_2, q)
 	if pos_on_line >= 0 then
 		return pos_on_line, u, v
 	end
+end
+
+function ray_triangle_intersection(origin, direction, triangle)
+	return moeller_trumbore(origin, direction, triangle, true)
+end
+
+function ray_parallelogram_intersection(origin, direction, parallelogram)
+	return moeller_trumbore(origin, direction, parallelogram)
 end
 
 function triangle_normal(triangle)

@@ -19,22 +19,30 @@ end
 get_extension = split_extension
 
 function split_path(filepath)
-	return modlib.text.split(filepath, dir_delim)
+	return modlib.text.split_unlimited(filepath, dir_delim, true)
 end
 
 -- concat_path is set by init.lua to avoid code duplication
 
 function read(filename)
-	local file = io.open(filename, "r")
-	if file == nil then return nil end
+	local file, err = io.open(filename, "r")
+	if file == nil then return nil, err end
+	local content = file:read"*a"
+	file:close()
+	return content
+end
+
+function read_binary(filename)
+	local file, err = io.open(filename, "rb")
+	if file == nil then return nil, err end
 	local content = file:read"*a"
 	file:close()
 	return content
 end
 
 function write_unsafe(filename, new_content)
-	local file = io.open(filename, "w")
-	if file == nil then return false end
+	local file, err = io.open(filename, "w")
+	if file == nil then return false, err end
 	file:write(new_content)
 	file:close()
 	return true
@@ -42,13 +50,15 @@ end
 
 write = minetest and minetest.safe_file_write or write_unsafe
 
-function write_binary(filename, new_content)
-	local file = io.open(filename, "wb")
-	if file == nil then return false end
+function write_binary_unsafe(filename, new_content)
+	local file, err = io.open(filename, "wb")
+	if file == nil then return false, err end
 	file:write(new_content)
 	file:close()
 	return true
 end
+
+write_binary = minetest and minetest.safe_file_write or write_binary_unsafe
 
 function ensure_content(filename, ensured_content)
 	local content = read(filename)
@@ -59,24 +69,23 @@ function ensure_content(filename, ensured_content)
 end
 
 function append(filename, new_content)
-	local file = io.open(filename, "a")
-	if file == nil then return false end
+	local file, err = io.open(filename, "a")
+	if file == nil then return false, err end
 	file:write(new_content)
 	file:close()
 	return true
 end
 
 function exists(filename)
-	local file = io.open(filename, "r")
-	if file == nil then return false end
+	local file, err = io.open(filename, "r")
+	if file == nil then return false, err end
 	file:close()
 	return true
 end
 
 function create_if_not_exists(filename, content)
 	if not exists(filename) then
-		write(filename, content or "")
-		return true
+		return write(filename, content or "")
 	end
 	return false
 end
@@ -112,11 +121,8 @@ end
 function process_bridge_listen(name, line_consumer, step)
 	local bridge = process_bridges[name]
 	modlib.minetest.register_globalstep(step or 0.1, function()
-		local content = io.open(bridge.input, "r")
-		local line = content:read()
-		while line do
+		for line in io.lines(bridge.input) do
 			line_consumer(line)
-			line = content:read()
 		end
 		write(bridge.input, "")
 	end)
