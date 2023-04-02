@@ -4,3 +4,6 @@
 [submodule "nate_modpack/modlib"]
 	path = nate_modpack/modlib
 	url = https://github.com/appgurueu/modlib.git
+[submodule "graffiti/ggraffiti"]
+	path = graffiti/ggraffiti
+	url = https://github.com/grorp/ggraffiti
