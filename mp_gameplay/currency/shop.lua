@@ -152,6 +152,15 @@ minetest.register_node("currency:shop", {
                              clicker:get_inventory():set_size("customer_gets", 3*2)
                              currency.shop.current_shop[clicker:get_player_name()] = pos
                              local meta = minetest.get_meta(pos)
+
+                             -- Make sure that if players manage to get a currency:shop, they can't use it to
+                             -- dupe items
+                             if minetest.check_player_privs(meta:get_string("owner"), "playerfactions_admin") == false then
+                                minetest.chat_send_player(clicker:get_player_name(), "Cannot use shop because the owner is not an admin.")
+                                return
+                             end
+
+
                              if clicker:get_player_name() == meta:get_string("owner") and not clicker:get_player_control().aux1 then
                                 minetest.show_formspec(clicker:get_player_name(),"currency:shop_formspec",currency.shop.formspec.owner(pos))
                              else
@@ -268,11 +277,18 @@ minetest.register_on_player_receive_fields(function(sender, formname, fields)
          end
          local wants = minv:get_list("owner_wants")
          local gives = minv:get_list("owner_gives")
-         
+
          if wants == nil or gives == nil then
             -- do not crash the server
             return
          end 
+
+
+         -- Verify that player is currently in a pvp_areas safezone
+         -- This acts as a failsafe so that if players get their hands
+         -- on currency shops, they can't use them outside of spawn
+
+
 
          -- Check if we can exchange
          local can_exchange = true
