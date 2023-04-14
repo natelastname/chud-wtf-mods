@@ -3,6 +3,8 @@
 -- Additional : Copyright Tai Kedzierski (DuCake)
 -- LGPL v2.1+
 
+local pvp_areas = {}
+
 local pvp_areas_worlddir = minetest.get_worldpath()
 local pvp_areas_modname = minetest.get_current_modname()
 
@@ -37,6 +39,12 @@ local area_label = settings:get("pvp_areas.label") or "Defined area."
 -- if false Mob does Damage
 local mobsDoNoDamage = false
 
+
+
+
+
+
+
 local pvp_areas_store = AreaStore()
 pvp_areas_store:from_file(pvp_areas_worlddir .. "/pvp_areas_store.dat")
 
@@ -44,7 +52,33 @@ local pvp_default = minetest.is_yes(settings:get_bool("pvp_areas.enable_pvp"))
 minetest.log("action", "[" .. pvp_areas_modname .. "] PvP by Default: " .. tostring(pvp_default))
 
 local pvp_areas_players = {}
-local pvp_areas = {}
+
+
+-- can't use "pvp_areas" because this mod uses that variable
+pvp_areas_api = {}
+function pvp_areas_api.pos_is_safezone(pos)
+
+   if pos == nil then
+      return false
+   end
+
+   local areas_at_pos = pvp_areas_store:get_areas_for_pos(pos)
+
+   if areas_at_pos == nil then
+      return false
+   end
+
+   for k, v in pairs(pvp_areas_store:get_areas_for_pos(pos)) do
+      if k then
+         return true
+      end
+   end
+
+   return false
+
+end
+
+
 
 local function update_pvp_areas()
 	local counter = 0

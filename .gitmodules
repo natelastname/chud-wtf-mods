@@ -1,4 +1,3 @@
-
 [submodule "nates_factions/modlib"]
 	path = nates_factions/modlib
 	url = https://github.com/appgurueu/modlib.git
