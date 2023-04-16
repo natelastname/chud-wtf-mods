@@ -15,15 +15,13 @@ local placeColour = function (colour)
 			y = pos.y + 1 + (dir.y * balloonPlaceDistanceFromPlayer),
 			z = pos.z + (dir.z * balloonPlaceDistanceFromPlayer),
 		}
-		local getPos = minetest.get_node(new_pos)
-      local user_name = user:get_player_name()
 
-      if minetest.is_protected(getPos, user_name) then
+      local user_name = user:get_player_name()
+      if minetest.is_protected(new_pos, user_name) then
          return nil
       end
 
-
-
+		local getPos = minetest.get_node(new_pos)
       if getPos.name == "air" or
 				getPos.name == "default:water_source" or
 				getPos.name == "default:water_flowing" or
