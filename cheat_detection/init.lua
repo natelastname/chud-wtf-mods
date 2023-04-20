@@ -40,7 +40,7 @@ local debug_mode = false
 -- Broadcast cheat accusations in global chat with a cooldown of chat_interval seconds between
 -- accusations of the same player. Do not punish anybody for anything.
 local test_mode = true
-local chat_interval = 5
+local chat_interval = 15
 local chat_cooldown = ctf_core.init_cooldowns()
 
 
@@ -388,7 +388,6 @@ end
 --Alert staff if goon is pulling hacks out of his own ass
 local function send_alert_to_serverstaff(suspect, suspicion)
 
-   
    if test_mode and not chat_cooldown:get(suspect) then
       minetest.chat_send_all("[CHEAT DETECTION (beta)]: ".. tostring(suspect) .. " accused of '" .. tostring(suspicion) .. "'")
       chat_cooldown:set(suspect, chat_interval)
