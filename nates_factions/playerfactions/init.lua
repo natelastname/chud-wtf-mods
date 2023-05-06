@@ -46,7 +46,7 @@ local function table_copy(data)
    local copy = {}
    if type(data) == "table" then
       for k,v in pairs(data) do
-	 copy[k]=table_copy(v)
+         copy[k]=table_copy(v)
       end
       return copy
    else
@@ -61,12 +61,12 @@ function factions.online_players_in_faction(fname)
    if facts[fname] == nil then
       return res
    end
-  
+
    for key, val in pairs(facts[fname].members) do
       local name = key
 
       if minetest.get_player_by_name(name) ~= nil then
-	 table.insert(res, name)
+         table.insert(res, name)
       end
    end
    return res
@@ -96,10 +96,10 @@ function factions.get_player_factions(name)
    local player_factions = nil
    for fname, fact in pairs(facts) do
       if fact.members[name] then
-	 if not player_factions then
-	    player_factions = {}
-	 end
-	 table.insert(player_factions, fname)
+         if not player_factions then
+            player_factions = {}
+         end
+         table.insert(player_factions, fname)
       end
    end
    if player_factions == nil then
@@ -133,10 +133,10 @@ function factions.get_owned_factions(name)
    local own_factions = nil
    for fname, fact in pairs(facts) do
       if fact.owner == name then
-	 if not own_factions then
-	    own_factions = {}
-	 end
-	 table.insert(own_factions, fname)
+         if not own_factions then
+            own_factions = {}
+         end
+         table.insert(own_factions, fname)
       end
    end
    return own_factions
@@ -146,10 +146,10 @@ function factions.get_administered_factions(name)
    local adm_factions = {}
    for fname, fact in pairs(facts) do
       if minetest.get_player_privs(name).playerfactions_admin or fact.owner == name then
-	 if not adm_factions then
-	    adm_factions = {}
-	 end
-	 table.insert(adm_factions, fname)
+         if not adm_factions then
+            adm_factions = {}
+         end
+         table.insert(adm_factions, fname)
       end
    end
    return adm_factions
@@ -290,19 +290,19 @@ function factions.tp_f_home(player_name)
 end
 
 function factions.join(name, faction_name, password)
-      if factions.get_player_faction(name) ~= nil and factions.mode_unique_faction then
-	 factions_send_player(name, S("You are already in a faction."))
-      elseif facts[faction_name] == nil then
-	 factions_send_player(name, S("The faction @1 doesn't exist.", faction_name))
-      elseif factions.get_password(faction_name) ~= password then
-	 factions_send_player(name, S("Permission denied: Wrong password."))
+   if factions.get_player_faction(name) ~= nil and factions.mode_unique_faction then
+      factions_send_player(name, S("You are already in a faction."))
+   elseif facts[faction_name] == nil then
+      factions_send_player(name, S("The faction @1 doesn't exist.", faction_name))
+   elseif factions.get_password(faction_name) ~= password then
+      factions_send_player(name, S("Permission denied: Wrong password."))
+   else
+      if factions.join_faction(faction_name, name) then
+         factions_send_player(name, S("Joined @1.", faction_name))
       else
-	 if factions.join_faction(faction_name, name) then
-	    factions_send_player(name, S("Joined @1.", faction_name))
-	 else
-	    factions_send_player(name, S("Error on joining."))
-	 end
+         factions_send_player(name, S("Error on joining."))
       end
+   end
 
 end
 function factions.disband(name)
@@ -320,31 +320,26 @@ function factions.disband(name)
    factions_send_player(name, S("Disbanded @1.", faction_name))
 end
 
-
+-- If faction_name is nil, it is looking up by name
 function factions.info(name, faction_name)
    if faction_name == nil then
-      local player_factions = factions.get_player_factions(name)
-      if player_factions ~= nil and #player_factions == 1 then
-	 faction_name = player_factions[1]
-      else
-	 factions_send_player(name, S("You are in many factions, you have to choose one of them: @1.", table.concat(player_factions, ", ")))
-	 return true
-      end
+      factions_send_player(name, S("No faction name provided."))
    end
+
    if facts[faction_name] == nil then
       factions_send_player(name, S("This faction doesn't exists."))
    else
       local fmembers = ""
       if table.getn(facts[faction_name].members) > factions.max_members_list then
-	 fmembers = S("The faction has more than @1 members, the members list can't be shown.", factions.max_members_list)
+         fmembers = S("The faction has more than @1 members, the members list can't be shown.", factions.max_members_list)
       else
-	 for play,_ in pairs(facts[faction_name].members) do
-	    if fmembers == "" then
-	       fmembers = play
-	    else
-	       fmembers = fmembers..", "..play
-	    end
-	 end
+         for play,_ in pairs(facts[faction_name].members) do
+            if fmembers == "" then
+               fmembers = play
+            else
+               fmembers = fmembers..", "..play
+            end
+         end
       end
       local msg = ""
       msg = msg .. "Name: " .. faction_name .. "\n"
@@ -354,7 +349,7 @@ function factions.info(name, faction_name)
       
       factions_send_player(name, msg)
       if factions.get_owner(faction_name) == name or minetest.get_player_privs(name).playerfactions_admin then
-	 factions_send_player(name, S("Password: @1", factions.get_password(faction_name)))
+         factions_send_player(name, S("Password: @1", factions.get_password(faction_name)))
       end
    end
 end
@@ -366,28 +361,28 @@ function factions.player_info(name, player_name)
       local str_owner = ""
       local str_member = ""
       for _,v in ipairs(player_factions) do
-	 if str_member == "" then
-	    str_member = str_member..v
-	 else
-	    str_member = str_member..", "..v
-	 end
+         if str_member == "" then
+            str_member = str_member..v
+         else
+            str_member = str_member..", "..v
+         end
       end
       factions_send_player(name, S("@1 is in the following factions: @2.", player_name, str_member))
       local owned_factions = factions.get_owned_factions(player_name)
       if not owned_factions then
-	 factions_send_player(name, S("This player is the owner of no faction."))
+         factions_send_player(name, S("This player is the owner of no faction."))
       else
-	 for _,v in ipairs(owned_factions) do
-	    if str_owner == "" then
-	       str_owner = str_owner..v
-	    else
-	       str_owner = str_owner..", "..v
-	    end
-	 end
-	 factions_send_player(name, S("This player is the owner of the following factions: @1.", str_owner))
+         for _,v in ipairs(owned_factions) do
+            if str_owner == "" then
+               str_owner = str_owner..v
+            else
+               str_owner = str_owner..", "..v
+            end
+         end
+         factions_send_player(name, S("This player is the owner of the following factions: @1.", str_owner))
       end
       if minetest.get_player_privs(player_name).playerfactions_admin then
-	 factions_send_player(name, S("@1 has the playerfactions_admin privilege so they can admin every faction.", player_name))
+         factions_send_player(name, S("@1 has the playerfactions_admin privilege so they can admin every faction.", player_name))
       end
    end
 end
@@ -427,9 +422,9 @@ function factions.leave(name)
       factions_send_player(name, S("You cannot leave your own faction, change owner or disband it."))
    else
       if factions.leave_faction(faction_name, name) then
-	 factions_send_player(name, S("Left @1.", faction_name))
+         factions_send_player(name, S("Left @1.", faction_name))
       else
-	 factions_send_player(name, S("Error on leaving faction."))
+         factions_send_player(name, S("Error on leaving faction."))
       end
    end
 end
@@ -454,9 +449,9 @@ function factions.kick(name, target)
       factions_send_player(name, S("You cannot kick the owner of a faction, use '/factions chown <player> [faction]' to change the ownership."))
    else
       if factions.leave_faction(faction_name, target) then
-	 factions_send_player(name, S("Kicked @1 from faction.", target))
+         factions_send_player(name, S("Kicked @1 from faction.", target))
       else
-	 factions_send_player(name, S("Error kicking @1 from faction.", target))
+         factions_send_player(name, S("Error kicking @1 from faction.", target))
       end
    end
 end
@@ -469,7 +464,7 @@ function factions.passwd(name, password)
       factions_send_player(name, S("You are the owner of no faction, you can't use this command."))
       return
    end
-      
+
    if faction_name == nil then
       factions_send_player(name, S("You are the owner of many factions, you have to choose one of them: @1.", table.concat(own_factions, ", ")))
    elseif password == nil then
@@ -478,9 +473,9 @@ function factions.passwd(name, password)
       factions_send_player(name, S("Permission denied: You are not the owner of this faction, and don't have the playerfactions_admin privilege."))
    else
       if factions.set_password(faction_name, password) then
-	 factions_send_player(name, S("Password has been updated."))
+         factions_send_player(name, S("Password has been updated."))
       else
-	 factions_send_player(name, S("Failed to change password."))
+         factions_send_player(name, S("Failed to change password."))
       end
    end
 end
@@ -503,9 +498,9 @@ function factions.chown_cmd(name, target)
       factions_send_player(name, S("@1 isn't in your faction.", target))
    else
       if factions.chown(faction_name, target) then
-	 factions_send_player(name, S("Ownership has been transferred to @1.", target))
+         factions_send_player(name, S("Ownership has been transferred to @1.", target))
       else
-	 factions_send_player(name, S("Failed to transfer ownership."))
+         factions_send_player(name, S("Failed to transfer ownership."))
       end
    end
 end
@@ -527,9 +522,9 @@ function factions.force_join(name, target, faction_name)
       factions_send_player(name, S("The player is already in the faction \"@1\".",factions.get_player_faction(target)))
    else
       if factions.join_faction(faction_name, target) then
-	 factions_send_player(name, S("@1 is now a member of the faction @2.", target, faction_name))
+         factions_send_player(name, S("@1 is now a member of the faction @2.", target, faction_name))
       else
-	 factions_send_player(name, S("Error on adding @1 into @2.", target, faction_name))
+         factions_send_player(name, S("Error on adding @1 into @2.", target, faction_name))
       end
    end
 end
@@ -615,31 +610,31 @@ local function handle_command(name, param)
 end
 
 minetest.register_chatcommand("f", {
-				 params = "create <faction> <password>: "..S("Create a new faction").."\n"
-				    .."list: "..S("List available factions").."\n"
-				    .."info <faction>: "..S("See information on a faction").."\n"
-				    .."player_info <player>: "..S("See information on a player").."\n"
-				    .."join <faction> <password>: "..S("Join an existing faction").."\n"
-				    .."leave: "..S("Leave your faction").."\n"
-				    .."kick <player>: "..S("Kick someone from your faction or from the given faction").."\n"
-				    .."disband <password>: "..S("Disband your faction or the given faction").."\n"
-				    .."passwd <password>: "..S("Change your faction's password or the password of the given faction").."\n"
-				    .."chown <player>: "..S("Transfer ownership of your faction").."\n"
-				    .."invite <player>: "..S("Invite a player to your faction.").."\n"
-				    .."forcejoin <player> <faction>: "..S("Add player to a faction. Requires playerfactions_admin priv.").."\n"
-				    .."debug: ".. "Print factions table to logs. Requires playerfactions_admin priv." .."\n"
-				    .."invite <player>: ".."Invite a player to your faction.".."\n"
-				    .."showclaim: ".."Make the boundaries of the currently occupied claim visible.".."\n"
-				    .."claimlist: ".."List the location of the faction's claims.".."\n"
-				    .."radar: ".."Show a map of nearby claims.".."\n"
-				    .."claim: ".."Attempt to claim the land that you are standing on.".."\n"
-				    .."unclaim: ".."Attempt to unclaim the land that you are standing on.".."\n"
-				    .."unclaimall: ".."Unclaim all faction territory.".."\n"
-				    .."sethome: ".."Set the faction home position.".."\n"
-				    .."home: ".."Teleport to the faction home position.".."\n",
-				 description = "",
-				 privs = {},
-				 func = handle_command
+                                 params = "create <faction> <password>: "..S("Create a new faction").."\n"
+                                    .."list: "..S("List available factions").."\n"
+                                    .."info <faction>: "..S("See information on a faction").."\n"
+                                    .."player_info <player>: "..S("See information on a player").."\n"
+                                    .."join <faction> <password>: "..S("Join an existing faction").."\n"
+                                    .."leave: "..S("Leave your faction").."\n"
+                                    .."kick <player>: "..S("Kick someone from your faction or from the given faction").."\n"
+                                    .."disband <password>: "..S("Disband your faction or the given faction").."\n"
+                                    .."passwd <password>: "..S("Change your faction's password or the password of the given faction").."\n"
+                                    .."chown <player>: "..S("Transfer ownership of your faction").."\n"
+                                    .."invite <player>: "..S("Invite a player to your faction.").."\n"
+                                    .."forcejoin <player> <faction>: "..S("Add player to a faction. Requires playerfactions_admin priv.").."\n"
+                                    .."debug: ".. "Print factions table to logs. Requires playerfactions_admin priv." .."\n"
+                                    .."invite <player>: ".."Invite a player to your faction.".."\n"
+                                    .."showclaim: ".."Make the boundaries of the currently occupied claim visible.".."\n"
+                                    .."claimlist: ".."List the location of the faction's claims.".."\n"
+                                    .."radar: ".."Show a map of nearby claims.".."\n"
+                                    .."claim: ".."Attempt to claim the land that you are standing on.".."\n"
+                                    .."unclaim: ".."Attempt to unclaim the land that you are standing on.".."\n"
+                                    .."unclaimall: ".."Unclaim all faction territory.".."\n"
+                                    .."sethome: ".."Set the faction home position.".."\n"
+                                    .."home: ".."Teleport to the faction home position.".."\n",
+                                 description = "",
+                                 privs = {},
+                                 func = handle_command
 })
 
 dofile(minetest.get_modpath("playerfactions").."/offline_raiding.lua")
