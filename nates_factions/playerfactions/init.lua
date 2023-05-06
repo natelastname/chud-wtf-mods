@@ -324,6 +324,7 @@ end
 function factions.info(name, faction_name)
    if faction_name == nil then
       factions_send_player(name, S("No faction name provided."))
+      return true
    end
 
    if facts[faction_name] == nil then
